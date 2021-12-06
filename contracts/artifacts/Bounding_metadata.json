@@ -1,0 +1,275 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "contract IWETH",
+						"name": "_eth",
+						"type": "address"
+					},
+					{
+						"internalType": "contract IERC20",
+						"name": "_gton",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_treasury",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_owner",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "discounts",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "eth",
+				"outputs": [
+					{
+						"internalType": "contract IWETH",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "gton",
+				"outputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "revertFlag",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "quotesUpper",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "quotesLower",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "address[]",
+						"name": "pools",
+						"type": "address[]"
+					}
+				],
+				"name": "setThePrice",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "treasury",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "userUnlock",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "rewardDebt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startBlock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/bounding.sol": "Bounding"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol": {
+			"keccak256": "0xe5905c0989cf5a865ed9bb7b9252536ca011c5b744017a82a7d4443b9c00a891",
+			"urls": [
+				"bzz-raw://5d2a90a0a796491507462a3da18c3f8819721d571572d765a2207c35bf0a0389",
+				"dweb:/ipfs/Qmf9ACYiT3qzjgsYuhm866FBdiBpRMXAPpQhSFbgqcyhHt"
+			]
+		},
+		"@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol": {
+			"keccak256": "0x7c9bc70e5996c763e02ff38905282bc24fb242b0ef2519a003b36824fc524a4b",
+			"urls": [
+				"bzz-raw://85d5ad2dd23ee127f40907a12865a1e8cb5828814f6f2480285e1827dd72dedf",
+				"dweb:/ipfs/QmayKQWJgWmr46DqWseADyUanmqxh662hPNdAkdHRjiQQH"
+			]
+		},
+		"contracts/bounding.sol": {
+			"keccak256": "0x6432042ed6fe9bf64056e764c8c983f7d48b70741caf41978b380f50eeb7b36a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dc9782da33d8817b647a985dafa975e48910a4e9d6f5879f8f4f48dbab1009c4",
+				"dweb:/ipfs/QmQwbE9erfMStiqJDkH9LCV5EhERgKb4u49t1NkDCwLYDq"
+			]
+		},
+		"contracts/interfaces/IERC20.sol": {
+			"keccak256": "0xbb8044a239ec6846bb5d456a41e55bde5fbfbf238cfd2826850324167076386b",
+			"urls": [
+				"bzz-raw://1ac583140f1de86be67bd52906923287c1b87a1405289d0f13adbe24e41604bf",
+				"dweb:/ipfs/QmZ2wqBgqw8wtgeBwnbnq2rhQAFqrehmtF3urYwcn49DWe"
+			]
+		},
+		"contracts/interfaces/IWETH.sol": {
+			"keccak256": "0x2b2dfdece146425af2c3468ccd72c52cbf709eb38421a300e21ef7f57b033fce",
+			"urls": [
+				"bzz-raw://d007835facffb20b731b70fc3ae59111485e04c012e80c0ae4e327a51b7819f9",
+				"dweb:/ipfs/QmcMxqwJyNLrk3mGUEqGgFNJdhdRARiMCcHhgU77YXnrqQ"
+			]
+		},
+		"contracts/libraries/SafeMath.sol": {
+			"keccak256": "0x68e08544c4e7e99aa6cf7284c64e88523b6dff99c890bce626d5ff583aa9dffd",
+			"urls": [
+				"bzz-raw://cff16f84eb20cf75eb0de6f2a1d3b3ffc5faac0df16f23f64293b3ad76682af7",
+				"dweb:/ipfs/QmTQWHrUyNXMpVYTrCxUBoDaFNYcmxZiiQvNiCNRy987za"
+			]
+		},
+		"contracts/libraries/UniswapV2Library.sol": {
+			"keccak256": "0x2bc9408d6b384af1b90edf1a7958b11557c9d9091ec5a1b5f7b12e0600c1a15f",
+			"urls": [
+				"bzz-raw://f82b6c5a1f50be7f859feece99a77fd246870d01e35b1c33156bcfd059cb8539",
+				"dweb:/ipfs/QmXmEBJ89yenTSEM8RnoNToCFud3y2Fqfz2sA8zqtr4oyx"
+			]
+		}
+	},
+	"version": 1
+}
