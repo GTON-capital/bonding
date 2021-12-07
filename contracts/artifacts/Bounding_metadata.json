@@ -34,6 +34,211 @@
 			{
 				"inputs": [
 					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"name": "addAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "addDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "allowedTokens",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"name": "changeAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "changeDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "boundId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					}
+				],
+				"name": "claimBound",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					}
+				],
+				"name": "claimBoundTotal",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "boundId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "tokenAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					}
+				],
+				"name": "createBound",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint256",
 						"name": "",
 						"type": "uint256"
@@ -79,11 +284,58 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "tokenPrice",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "getTokenAmountWithDiscount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "gton",
 				"outputs": [
 					{
 						"internalType": "contract IERC20",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "gtonPrice",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
 						"name": "",
 						"type": "address"
 					}
@@ -120,22 +372,45 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256[]",
-						"name": "quotesUpper",
-						"type": "uint256[]"
-					},
-					{
-						"internalType": "uint256[]",
-						"name": "quotesLower",
-						"type": "uint256[]"
-					},
-					{
-						"internalType": "address[]",
-						"name": "pools",
-						"type": "address[]"
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
 					}
 				],
-				"name": "setThePrice",
+				"name": "rmAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					}
+				],
+				"name": "rmDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "toggleRevert",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -220,6 +495,14 @@
 		"remappings": []
 	},
 	"sources": {
+		"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+			"keccak256": "0xe6f5ac8c47f3b9b6135051efb9216f9ba5b312a6ecc20209b4f66a780443c328",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ded4aa77b7b8f222a2d992eb95b03592be3250b826b6a38a4c790d2dec8b0d47",
+				"dweb:/ipfs/QmNUKpTKXWsBBNMyzZuYvEZ2pUhZ2zEhQuyvxYZpTwo4eT"
+			]
+		},
 		"@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol": {
 			"keccak256": "0xe5905c0989cf5a865ed9bb7b9252536ca011c5b744017a82a7d4443b9c00a891",
 			"urls": [
@@ -235,11 +518,11 @@
 			]
 		},
 		"contracts/bounding.sol": {
-			"keccak256": "0x6432042ed6fe9bf64056e764c8c983f7d48b70741caf41978b380f50eeb7b36a",
+			"keccak256": "0x5dbe16067fd06fe98fd4cb685bc91282c8e0333eefb742754c3b17e8758874a0",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://dc9782da33d8817b647a985dafa975e48910a4e9d6f5879f8f4f48dbab1009c4",
-				"dweb:/ipfs/QmQwbE9erfMStiqJDkH9LCV5EhERgKb4u49t1NkDCwLYDq"
+				"bzz-raw://5339edfc02238277b14aa838bc85c2e002d80fef35364bb4c22b0ae503400067",
+				"dweb:/ipfs/QmSm8mSW13c51AmHmvmog8P9jVsGe18fiCDudVvduX3WuQ"
 			]
 		},
 		"contracts/interfaces/IERC20.sol": {
