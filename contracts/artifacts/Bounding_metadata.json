@@ -42,6 +42,11 @@
 						"internalType": "contract ICan",
 						"name": "can",
 						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
 					}
 				],
 				"name": "addAllowedToken",
@@ -64,11 +69,6 @@
 					{
 						"internalType": "uint256",
 						"name": "discountDiv",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "minimalAmount",
 						"type": "uint256"
 					}
 				],
@@ -101,6 +101,11 @@
 						"internalType": "contract ICan",
 						"name": "can",
 						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -122,6 +127,11 @@
 						"internalType": "contract ICan",
 						"name": "can",
 						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
 					}
 				],
 				"name": "changeAllowedToken",
@@ -259,11 +269,6 @@
 					{
 						"internalType": "uint256",
 						"name": "discountDiv",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "minimalAmount",
 						"type": "uint256"
 					}
 				],
@@ -518,11 +523,11 @@
 			]
 		},
 		"contracts/bounding.sol": {
-			"keccak256": "0x5dbe16067fd06fe98fd4cb685bc91282c8e0333eefb742754c3b17e8758874a0",
+			"keccak256": "0xdaca04cf9a3bd284fd3b721aca509538b15bb2408bcc4045c1b463999a29531e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://5339edfc02238277b14aa838bc85c2e002d80fef35364bb4c22b0ae503400067",
-				"dweb:/ipfs/QmSm8mSW13c51AmHmvmog8P9jVsGe18fiCDudVvduX3WuQ"
+				"bzz-raw://5fe50a3ea616c30e1a35b20be0f70fe5239f1a7f812d1d35bfbe12c43a90a752",
+				"dweb:/ipfs/QmS4WA6fiazsQqerjm7iCCuQT3AFFZGVYvfQVuf55MGuGt"
 			]
 		},
 		"contracts/interfaces/IERC20.sol": {
