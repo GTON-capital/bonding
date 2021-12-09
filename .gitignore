@@ -2,6 +2,5 @@ node_modules/
 build/
 typechain/
 abi/
-/contracts/artifacts/
-/contracts/interfaces/artifacts/
-/contracts/libraries/artifacts/
+cache/
+artifacts/

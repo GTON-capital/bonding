@@ -2,26 +2,23 @@
 pragma solidity ^0.8.0;
 
 import "./interfaces/IERC20.sol";
-import "./interfaces/IWETH.sol";
 import "./interfaces/ICan.sol";
-import './libraries/UniswapV2Library.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract Bounding {
-    IWETH public eth;
-    IERC20 public gton;
+    address public owner;
+    bool public revertFlag;
     address public treasury;
 
-    address public owner;
+    IERC20 public gton;
     AggregatorV3Interface public gtonPrice;
-    bool public revertFlag;
+
     uint contractRequiredGtonBalance;
     Discounts[] public discounts;
+    AllowedTokens[] public allowedTokens;
     mapping (address => UserUnlock[]) public userUnlock;
     // address of token => address of price sc
-
-    AllowedTokens[] public allowedTokens;
 
     struct AllowedTokens {
         AggregatorV3Interface price;
@@ -43,23 +40,34 @@ contract Bounding {
         uint minimalAmount;
     }
 
+    constructor (
+        IERC20 _gton,
+        address _treasury
+    ) {
+        gton = _gton;
+        treasury = _treasury;
+        owner = msg.sender;
+    }
+
     modifier onlyOwner() {
-        require(msg.sender == owner,"not owner");
+        require(msg.sender == owner,"Bounder: permitted to owner only.");
         _;
     }   
-
     
     modifier notReverted() {
-        require(!revertFlag,"reverted");
+        require(!revertFlag,"Bounder: reverted flag on.");
         _;
     }   
 
     function toggleRevert() public onlyOwner {
         revertFlag = !revertFlag;
+        emit RevertFlag(revertFlag);
     }
 
     function transferOwnership(address newOwner) public onlyOwner {
+        address oldOwner = owner;
         owner = newOwner;
+        emit SetOwner(oldOwner, newOwner);
     }
 
     function addAllowedToken(
@@ -91,7 +99,7 @@ contract Bounding {
     function rmDiscount(
         uint id
     ) public onlyOwner {
-        discounts[id] = discounts[discounts.length];
+        discounts[id] = discounts[discounts.length - 1];
         discounts.pop();
     }
 
@@ -126,20 +134,8 @@ contract Bounding {
     function rmAllowedToken(
         uint id
     ) public onlyOwner {
-        allowedTokens[id] = allowedTokens[allowedTokens.length];
+        allowedTokens[id] = allowedTokens[allowedTokens.length - 1];
         allowedTokens.pop();
-    }
-
-    constructor (
-        IWETH _eth,
-        IERC20 _gton,
-        address _treasury,
-        address _owner
-    ) {
-        eth = _eth;
-        gton = _gton;
-        treasury = _treasury;
-        owner = _owner;
     }
 
     function getTokenAmountWithDiscount(
@@ -168,11 +164,10 @@ contract Bounding {
     ) public notReverted {
         Discounts memory disc = discounts[boundId];
         AllowedTokens memory tok = allowedTokens[tokenId];
-        require(tok.token == tokenAddress, "ops");
-        require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "ops");
-        require(tok.token == tokenAddress, "ops");
+        require(tok.token == tokenAddress, "Bounding: wrong token address.");
+        require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "Bounding: discound policy has changed.");
         require(tokenAmount > disc.minimalAmount,"amount lower than minimal");
-        require(IERC20(tok.token).transferFrom(msg.sender,address(this),tokenAmount),"not enough allowance");
+        require(IERC20(tok.token).transferFrom(msg.sender,address(this),tokenAmount),"Bounding: not enough allowance.");
 
         uint amount = getTokenAmountWithDiscount(
             disc.discountMul,
@@ -211,14 +206,12 @@ contract Bounding {
 
         // rm this bound if it is over
         if (amount + user.rewardDebt == currentUnlock && block.number >= user.startBlock + user.delta) {
-            userUnlock[msg.sender][boundId] = userUnlock[msg.sender][userUnlock[msg.sender].length];
+            userUnlock[msg.sender][boundId] = userUnlock[msg.sender][userUnlock[msg.sender].length - 1];
             userUnlock[msg.sender].pop();
         }
     }
 
-    function claimBoundTotal(
-        address to
-    ) public notReverted {
+    function claimBoundTotal(address to) public notReverted {
         // optimistycally transfer gton
 
         uint accamulatedAmount = 0;
@@ -234,11 +227,14 @@ contract Bounding {
         // rm  bounds if they are over
         for(uint i = 0; i < user.length;) {
             if (block.number >= user[i].startBlock + user[i].delta) {
-                userUnlock[msg.sender][i] = userUnlock[msg.sender][userUnlock[msg.sender].length];
+                userUnlock[msg.sender][i] = userUnlock[msg.sender][userUnlock[msg.sender].length - 1];
                 userUnlock[msg.sender].pop();
             }  else {
                 i++;
             }
         }
     }
+
+    event RevertFlag(bool flag);
+    event SetOwner(address oldOwner, address newOwner);
 }
