@@ -52,6 +52,7 @@ contract Bounding {
         AggregatorV3Interface price;
         address token;
         ICan can; 
+        uint minimalAmount;
     }
 
     struct UserUnlock {
@@ -65,7 +66,6 @@ contract Bounding {
         uint delta;
         uint discountMul;
         uint discountDiv;
-        uint minimalAmount;
     }
 
     modifier onlyOwner() {
@@ -89,27 +89,27 @@ contract Bounding {
 
     function addAllowedToken(
         AggregatorV3Interface price,
-        ICan can
+        ICan can,
+        uint minimalAmount
     ) public onlyOwner {
         (,,,,,,,,address token,,) = can.canInfo();
         allowedTokens.push(AllowedTokens({
             price: price,
             token: token,
-            can: can
+            can: can,
+            minimalAmount: minimalAmount
         }));
     }
 
     function addDiscount(
         uint delta,
         uint discountMul,
-        uint discountDiv,
-        uint minimalAmount
+        uint discountDiv
     ) public onlyOwner {
         discounts.push(Discounts({
             delta: delta,
             discountMul: discountMul,
-            discountDiv: discountDiv,
-            minimalAmount: minimalAmount
+            discountDiv: discountDiv
         }));
     }
 
@@ -130,21 +130,22 @@ contract Bounding {
         discounts[id] = Discounts({
             delta: delta,
             discountMul: discountMul,
-            discountDiv: discountDiv,
-            minimalAmount: minimalAmount
+            discountDiv: discountDiv
         });
     }
 
     function changeAllowedToken(
         uint id,
         AggregatorV3Interface price,
-        ICan can
+        ICan can,
+        uint minimalAmount
     ) public onlyOwner {
         (,,,,,,,,address token,,) = can.canInfo();
         allowedTokens[id] = AllowedTokens({
             price: price,
             token: token,
-            can: can
+            can: can,
+            minimalAmount: minimalAmount
         });
     }
 
@@ -196,7 +197,7 @@ contract Bounding {
         require(tok.token == tokenAddress, "ops");
         require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "ops");
         require(tok.token == tokenAddress, "ops");
-        require(tokenAmount > disc.minimalAmount,"amount lower than minimal");
+        require(tokenAmount > tok.minimalAmount,"amount lower than minimal");
         require(IERC20(tok.token).transferFrom(msg.sender,address(this),tokenAmount),"not enough allowance");
 
         uint amount = getTokenAmountWithDiscount(
