@@ -33,7 +33,7 @@ interface Boundingfixture extends TokensFixture {
 }
 
 export const boundingFixture: Fixture<Boundingfixture> = async function ([
-    wallet,
+    wallet, treasury
 ]): Promise<Boundingfixture> {
     const { weth, token0, token1, gton } = await tokensFixture()
     const aggFactory = await ethers.getContractFactory("TestAggregator");
@@ -41,7 +41,7 @@ export const boundingFixture: Fixture<Boundingfixture> = async function ([
     const gtonAgg = (await aggFactory.deploy(8, 1000000000)) as TestAggregator
     const wethAgg = (await aggFactory.deploy(8, 1000000000)) as TestAggregator
     const bounfingF = await ethers.getContractFactory("Bounding")
-    const bounding = (await bounfingF.deploy()) as Bounding
+    const bounding = (await bounfingF.deploy(gton.address, treasury.address)) as Bounding
     return {
         weth,
         token0,

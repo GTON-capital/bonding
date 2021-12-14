@@ -70,17 +70,14 @@ contract Bounding {
         emit SetOwner(oldOwner, newOwner);
     }
 
-    function addAllowedToken(
-        AggregatorV3Interface price,
-        ICan can
-    ) public onlyOwner {
-        (,,,,,,,,address token,,) = can.canInfo();
-        allowedTokens.push(AllowedTokens({
-            price: price,
-            token: token,
-            can: can
-        }));
+    function discountsLength() public view returns(uint) {
+        return discounts.length;
     }
+
+    function tokensLength() public view returns(uint) {
+        return allowedTokens.length;
+    }
+
 
     function addDiscount(
         uint delta,
@@ -96,9 +93,7 @@ contract Bounding {
         }));
     }
 
-    function rmDiscount(
-        uint id
-    ) public onlyOwner {
+    function rmDiscount(uint id) public onlyOwner {
         discounts[id] = discounts[discounts.length - 1];
         discounts.pop();
     }
@@ -118,6 +113,24 @@ contract Bounding {
         });
     }
 
+
+    function addAllowedToken(
+        AggregatorV3Interface price,
+        ICan can
+    ) public onlyOwner {
+        (,,,,,,,,address token,,) = can.canInfo();
+        allowedTokens.push(AllowedTokens({
+            price: price,
+            token: token,
+            can: can
+        }));
+    }
+
+    function rmAllowedToken(uint id) public onlyOwner {
+        allowedTokens[id] = allowedTokens[allowedTokens.length - 1];
+        allowedTokens.pop();
+    }
+
     function changeAllowedToken(
         uint id,
         AggregatorV3Interface price,
@@ -131,12 +144,6 @@ contract Bounding {
         });
     }
 
-    function rmAllowedToken(
-        uint id
-    ) public onlyOwner {
-        allowedTokens[id] = allowedTokens[allowedTokens.length - 1];
-        allowedTokens.pop();
-    }
 
     function getTokenAmountWithDiscount(
         uint discountMul,
@@ -154,7 +161,7 @@ contract Bounding {
             / gtonPriceUSD / int256(uint(tokenDecimals)) / int256(discountDiv));
     }
 
-    function createBound (
+    function createBound(
             uint boundId, 
             uint tokenId, 
             address tokenAddress, 
@@ -166,7 +173,7 @@ contract Bounding {
         AllowedTokens memory tok = allowedTokens[tokenId];
         require(tok.token == tokenAddress, "Bounding: wrong token address.");
         require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "Bounding: discound policy has changed.");
-        require(tokenAmount > disc.minimalAmount,"amount lower than minimal");
+        require(tokenAmount > disc.minimalAmount,"Bounding: amount lower than minimal");
         require(IERC20(tok.token).transferFrom(msg.sender,address(this),tokenAmount),"Bounding: not enough allowance.");
 
         uint amount = getTokenAmountWithDiscount(
@@ -185,7 +192,7 @@ contract Bounding {
         }));
 
         // send to candyshop for treasury
-        require(IERC20(tok.token).approve(address(tok.can),tokenAmount),"cant approve");
+        require(IERC20(tok.token).approve(address(tok.can),tokenAmount),"Bounding: Error when approve token");
         tok.can.mintFor(treasury,tokenAmount);
         contractRequiredGtonBalance += amount;
     }
