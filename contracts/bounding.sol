@@ -24,6 +24,7 @@ contract Bounding {
         AggregatorV3Interface price;
         address token;
         ICan can; 
+        uint minimalAmount;
     }
 
     struct UserUnlock {
@@ -37,7 +38,6 @@ contract Bounding {
         uint delta;
         uint discountMul;
         uint discountDiv;
-        uint minimalAmount;
     }
 
     constructor (
@@ -82,14 +82,12 @@ contract Bounding {
     function addDiscount(
         uint delta,
         uint discountMul,
-        uint discountDiv,
-        uint minimalAmount
+        uint discountDiv
     ) public onlyOwner {
         discounts.push(Discounts({
             delta: delta,
             discountMul: discountMul,
-            discountDiv: discountDiv,
-            minimalAmount: minimalAmount
+            discountDiv: discountDiv
         }));
     }
 
@@ -102,29 +100,29 @@ contract Bounding {
         uint id,
         uint delta,
         uint discountMul,
-        uint discountDiv,
-        uint minimalAmount
+        uint discountDiv
     ) public onlyOwner {
         discounts[id] = Discounts({
             delta: delta,
             discountMul: discountMul,
-            discountDiv: discountDiv,
-            minimalAmount: minimalAmount
+            discountDiv: discountDiv
         });
     }
 
-
     function addAllowedToken(
         AggregatorV3Interface price,
-        ICan can
+        ICan can,
+        uint minimalAmount
     ) public onlyOwner {
         (,,,,,,,,address token,,) = can.canInfo();
         allowedTokens.push(AllowedTokens({
             price: price,
             token: token,
-            can: can
+            can: can,
+            minimalAmount: minimalAmount
         }));
     }
+
 
     function rmAllowedToken(uint id) public onlyOwner {
         allowedTokens[id] = allowedTokens[allowedTokens.length - 1];
@@ -134,13 +132,15 @@ contract Bounding {
     function changeAllowedToken(
         uint id,
         AggregatorV3Interface price,
-        ICan can
+        ICan can,
+        uint minimalAmount
     ) public onlyOwner {
         (,,,,,,,,address token,,) = can.canInfo();
         allowedTokens[id] = AllowedTokens({
             price: price,
             token: token,
-            can: can
+            can: can,
+            minimalAmount: minimalAmount
         });
     }
 
@@ -173,7 +173,7 @@ contract Bounding {
         AllowedTokens memory tok = allowedTokens[tokenId];
         require(tok.token == tokenAddress, "Bounding: wrong token address.");
         require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "Bounding: discound policy has changed.");
-        require(tokenAmount > disc.minimalAmount,"Bounding: amount lower than minimal");
+        require(tokenAmount > tok.minimalAmount,"Bounding: amount lower than minimal");
         require(IERC20(tok.token).transferFrom(msg.sender,address(this),tokenAmount),"Bounding: not enough allowance.");
 
         uint amount = getTokenAmountWithDiscount(

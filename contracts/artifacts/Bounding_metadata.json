@@ -1,0 +1,574 @@
+{
+	"compiler": {
+		"version": "0.8.10+commit.fc410830"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "_gton",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_treasury",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "flag",
+						"type": "bool"
+					}
+				],
+				"name": "RevertFlag",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "oldOwner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "SetOwner",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"name": "addAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "addDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "allowedTokens",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "price",
+						"type": "address"
+					},
+					{
+						"internalType": "contract ICan",
+						"name": "can",
+						"type": "address"
+					}
+				],
+				"name": "changeAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "changeDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "boundId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					}
+				],
+				"name": "claimBound",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					}
+				],
+				"name": "claimBoundTotal",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "boundId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "tokenAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					}
+				],
+				"name": "createBound",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "discounts",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minimalAmount",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "discountsLength",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "discountMul",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "discountDiv",
+						"type": "uint256"
+					},
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "tokenPrice",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "getTokenAmountWithDiscount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "gton",
+				"outputs": [
+					{
+						"internalType": "contract IERC20",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "gtonPrice",
+				"outputs": [
+					{
+						"internalType": "contract AggregatorV3Interface",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "revertFlag",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					}
+				],
+				"name": "rmAllowedToken",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					}
+				],
+				"name": "rmDiscount",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "toggleRevert",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "tokensLength",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "treasury",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "userUnlock",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "rewardDebt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startBlock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "delta",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Bounding.sol": "Bounding"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol": {
+			"keccak256": "0xe6f5ac8c47f3b9b6135051efb9216f9ba5b312a6ecc20209b4f66a780443c328",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ded4aa77b7b8f222a2d992eb95b03592be3250b826b6a38a4c790d2dec8b0d47",
+				"dweb:/ipfs/QmNUKpTKXWsBBNMyzZuYvEZ2pUhZ2zEhQuyvxYZpTwo4eT"
+			]
+		},
+		"@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol": {
+			"keccak256": "0xe5905c0989cf5a865ed9bb7b9252536ca011c5b744017a82a7d4443b9c00a891",
+			"urls": [
+				"bzz-raw://5d2a90a0a796491507462a3da18c3f8819721d571572d765a2207c35bf0a0389",
+				"dweb:/ipfs/Qmf9ACYiT3qzjgsYuhm866FBdiBpRMXAPpQhSFbgqcyhHt"
+			]
+		},
+		"contracts/Bounding.sol": {
+			"keccak256": "0x90179d32a5a3505f4144c8a41fc6c531fa1ce86279f0c57a4712014711244c7a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d1f44896d2af0ba51bca3db7592f450283b4ebe8554f8655b5a3f85e6190b0bc",
+				"dweb:/ipfs/Qmd2T3bPdo5ArswHYn4g8e91i9QZQxEUMFCggUkyNE2SUC"
+			]
+		},
+		"contracts/interfaces/ICan.sol": {
+			"keccak256": "0x45355ab03775c1e657c872aa7651c034e473d0e48107d9c03eeba837a69e79e2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://970a70c075fa7f03ce678a40f21c2627fc920840efb99078ad2d2d31a8a28991",
+				"dweb:/ipfs/QmSsas4ZPaDDt4uHtgeLnyHVgVeRrNFz22ScMQ5rPCUwNT"
+			]
+		},
+		"contracts/interfaces/IERC20.sol": {
+			"keccak256": "0xbd5cbe0a7e56f40b6b118822e4e2f3cedaa7195b71b211532604e007d06a06c3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://459aa5f00e74e5b59b7cea6369736a30ae740001d1a8f815bf19764a3d81c30d",
+				"dweb:/ipfs/QmVEgS4xtGjmTVEStyDz2V3Hq7dGTHmfD7ihFSssMjUYXy"
+			]
+		}
+	},
+	"version": 1
+}
