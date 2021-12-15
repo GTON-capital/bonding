@@ -1,17 +1,12 @@
 {
 	"compiler": {
-		"version": "0.8.7+commit.e28d00a7"
+		"version": "0.8.10+commit.fc410830"
 	},
 	"language": "Solidity",
 	"output": {
 		"abi": [
 			{
 				"inputs": [
-					{
-						"internalType": "contract IWETH",
-						"name": "_eth",
-						"type": "address"
-					},
 					{
 						"internalType": "contract IERC20",
 						"name": "_gton",
@@ -21,15 +16,42 @@
 						"internalType": "address",
 						"name": "_treasury",
 						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "_owner",
-						"type": "address"
 					}
 				],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "flag",
+						"type": "bool"
+					}
+				],
+				"name": "RevertFlag",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "oldOwner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "SetOwner",
+				"type": "event"
 			},
 			{
 				"inputs": [
@@ -272,12 +294,12 @@
 			},
 			{
 				"inputs": [],
-				"name": "eth",
+				"name": "discountsLength",
 				"outputs": [
 					{
-						"internalType": "contract IWETH",
+						"internalType": "uint256",
 						"name": "",
-						"type": "address"
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -403,6 +425,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "tokensLength",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -481,7 +516,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/bounding.sol": "Bounding"
+			"contracts/Bounding.sol": "Bounding"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -510,47 +545,28 @@
 				"dweb:/ipfs/Qmf9ACYiT3qzjgsYuhm866FBdiBpRMXAPpQhSFbgqcyhHt"
 			]
 		},
-		"@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol": {
-			"keccak256": "0x7c9bc70e5996c763e02ff38905282bc24fb242b0ef2519a003b36824fc524a4b",
-			"urls": [
-				"bzz-raw://85d5ad2dd23ee127f40907a12865a1e8cb5828814f6f2480285e1827dd72dedf",
-				"dweb:/ipfs/QmayKQWJgWmr46DqWseADyUanmqxh662hPNdAkdHRjiQQH"
-			]
-		},
-		"contracts/bounding.sol": {
-			"keccak256": "0x5dbe16067fd06fe98fd4cb685bc91282c8e0333eefb742754c3b17e8758874a0",
+		"contracts/Bounding.sol": {
+			"keccak256": "0x90179d32a5a3505f4144c8a41fc6c531fa1ce86279f0c57a4712014711244c7a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://5339edfc02238277b14aa838bc85c2e002d80fef35364bb4c22b0ae503400067",
-				"dweb:/ipfs/QmSm8mSW13c51AmHmvmog8P9jVsGe18fiCDudVvduX3WuQ"
+				"bzz-raw://d1f44896d2af0ba51bca3db7592f450283b4ebe8554f8655b5a3f85e6190b0bc",
+				"dweb:/ipfs/Qmd2T3bPdo5ArswHYn4g8e91i9QZQxEUMFCggUkyNE2SUC"
+			]
+		},
+		"contracts/interfaces/ICan.sol": {
+			"keccak256": "0x45355ab03775c1e657c872aa7651c034e473d0e48107d9c03eeba837a69e79e2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://970a70c075fa7f03ce678a40f21c2627fc920840efb99078ad2d2d31a8a28991",
+				"dweb:/ipfs/QmSsas4ZPaDDt4uHtgeLnyHVgVeRrNFz22ScMQ5rPCUwNT"
 			]
 		},
 		"contracts/interfaces/IERC20.sol": {
-			"keccak256": "0xbb8044a239ec6846bb5d456a41e55bde5fbfbf238cfd2826850324167076386b",
+			"keccak256": "0xbd5cbe0a7e56f40b6b118822e4e2f3cedaa7195b71b211532604e007d06a06c3",
+			"license": "MIT",
 			"urls": [
-				"bzz-raw://1ac583140f1de86be67bd52906923287c1b87a1405289d0f13adbe24e41604bf",
-				"dweb:/ipfs/QmZ2wqBgqw8wtgeBwnbnq2rhQAFqrehmtF3urYwcn49DWe"
-			]
-		},
-		"contracts/interfaces/IWETH.sol": {
-			"keccak256": "0x2b2dfdece146425af2c3468ccd72c52cbf709eb38421a300e21ef7f57b033fce",
-			"urls": [
-				"bzz-raw://d007835facffb20b731b70fc3ae59111485e04c012e80c0ae4e327a51b7819f9",
-				"dweb:/ipfs/QmcMxqwJyNLrk3mGUEqGgFNJdhdRARiMCcHhgU77YXnrqQ"
-			]
-		},
-		"contracts/libraries/SafeMath.sol": {
-			"keccak256": "0x68e08544c4e7e99aa6cf7284c64e88523b6dff99c890bce626d5ff583aa9dffd",
-			"urls": [
-				"bzz-raw://cff16f84eb20cf75eb0de6f2a1d3b3ffc5faac0df16f23f64293b3ad76682af7",
-				"dweb:/ipfs/QmTQWHrUyNXMpVYTrCxUBoDaFNYcmxZiiQvNiCNRy987za"
-			]
-		},
-		"contracts/libraries/UniswapV2Library.sol": {
-			"keccak256": "0x2bc9408d6b384af1b90edf1a7958b11557c9d9091ec5a1b5f7b12e0600c1a15f",
-			"urls": [
-				"bzz-raw://f82b6c5a1f50be7f859feece99a77fd246870d01e35b1c33156bcfd059cb8539",
-				"dweb:/ipfs/QmXmEBJ89yenTSEM8RnoNToCFud3y2Fqfz2sA8zqtr4oyx"
+				"bzz-raw://459aa5f00e74e5b59b7cea6369736a30ae740001d1a8f815bf19764a3d81c30d",
+				"dweb:/ipfs/QmVEgS4xtGjmTVEStyDz2V3Hq7dGTHmfD7ihFSssMjUYXy"
 			]
 		}
 	},
