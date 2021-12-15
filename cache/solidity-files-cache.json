@@ -74,8 +74,8 @@
       ]
     },
     "/Users/googrand/projects/bonding/contracts/Bounding.sol": {
-      "lastModificationDate": 1639483004499,
-      "contentHash": "9e2a90211bb2ab11be2f87e923b85d55",
+      "lastModificationDate": 1639557763782,
+      "contentHash": "eded73207c5edb485ba3bd9bf365b1d2",
       "sourceName": "contracts/Bounding.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -101,6 +101,7 @@
         }
       },
       "imports": [
+        "hardhat/console.sol",
         "./interfaces/IERC20.sol",
         "./interfaces/ICan.sol",
         "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol",
@@ -469,6 +470,41 @@
       ],
       "artifacts": [
         "TestCan"
+      ]
+    },
+    "/Users/googrand/projects/bonding/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1639029940911,
+      "contentHash": "cc4777addd464ea56fa35b1c45df0591",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }

@@ -51,7 +51,7 @@ export const boundingFixture: Fixture<Boundingfixture> = async function ([
     const token1Can = (await canFactory.deploy(token1.address)) as TestCan;
     const wethCan = (await canFactory.deploy(weth.address)) as TestCan;
     const bounfingF = await ethers.getContractFactory("Bounding")
-    const bounding = (await bounfingF.deploy(gton.address, treasury.address)) as Bounding
+    const bounding = (await bounfingF.deploy(gton.address, treasury.address, gtonAgg.address)) as Bounding
     return {
         weth,
         token0,
