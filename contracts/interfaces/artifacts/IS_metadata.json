@@ -241,7 +241,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/interfaces/IERC20.sol": "IERC20"
+			"contracts/interfaces/IStaking.sol": "IS"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -255,11 +255,11 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/interfaces/IERC20.sol": {
-			"keccak256": "0xe31da5406ee9ef4fb7f94bf7c5418a7bc028011139eb1da50252c9921f78c2b5",
+		"contracts/interfaces/IStaking.sol": {
+			"keccak256": "0x821eb02682a81061ee95e1fd531ab7bbfe9a20c9447cb9e210f69e327310a240",
 			"urls": [
-				"bzz-raw://13606e047b082801bb57349f015fb55fb3e306f7e790ddf45539a6b30a7775c1",
-				"dweb:/ipfs/QmeDvnPhmdcTemZ1iAdcRKX78eztEhDmVEyGNnmMHVFQxm"
+				"bzz-raw://69f254cec4d717f0f9f6358fcc80e68b730ca3a07b834593d24b8eae694e419b",
+				"dweb:/ipfs/QmYPE2nJWTfYfj5PZeuFDNPNnGkutNUaajSkSaLf6XQCp4"
 			]
 		}
 	},
