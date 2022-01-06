@@ -123,6 +123,43 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_balance",
+						"type": "uint256"
+					}
+				],
+				"name": "balanceToShare",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_share",
+						"type": "uint256"
+					}
+				],
+				"name": "burn",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "decimals",
 				"outputs": [
@@ -136,6 +173,24 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_to",
+						"type": "address"
+					}
+				],
+				"name": "mint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "name",
 				"outputs": [
@@ -143,6 +198,25 @@
 						"internalType": "string",
 						"name": "",
 						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_share",
+						"type": "uint256"
+					}
+				],
+				"name": "shareToBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
 					}
 				],
 				"stateMutability": "view",
@@ -226,6 +300,24 @@
 				],
 				"stateMutability": "nonpayable",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "share",
+						"type": "uint256"
+					}
+				],
+				"name": "transferShare",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -241,7 +333,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/interfaces/IERC20.sol": "IERC20"
+			"contracts/interfaces/IStaking.sol": "IStaking"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -255,11 +347,11 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/interfaces/IERC20.sol": {
-			"keccak256": "0xe31da5406ee9ef4fb7f94bf7c5418a7bc028011139eb1da50252c9921f78c2b5",
+		"contracts/interfaces/IStaking.sol": {
+			"keccak256": "0x8c7824ef0a0674c25a8448109cc315531e4b0919229505cec8366ff3c8d0b73e",
 			"urls": [
-				"bzz-raw://13606e047b082801bb57349f015fb55fb3e306f7e790ddf45539a6b30a7775c1",
-				"dweb:/ipfs/QmeDvnPhmdcTemZ1iAdcRKX78eztEhDmVEyGNnmMHVFQxm"
+				"bzz-raw://2ae6e5b10adc7cfc16453fc3078bfdedc7d62de749596b7be8cf2909d45d47f4",
+				"dweb:/ipfs/QmZctPp4yj4uy1reXfsEHdVe8mH39jSQMQcwGJo7seiNXz"
 			]
 		}
 	},
