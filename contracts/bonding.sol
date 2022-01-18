@@ -33,7 +33,7 @@ interface ICan {
     );
 }
 
-contract Bounding {
+contract Bonding {
     IWETH public eth;
     IERC20 public gton;
     address public treasury;
@@ -184,15 +184,15 @@ contract Bounding {
             / gtonPriceUSD / int256(uint(tokenDecimals)) / int256(discountDiv));
     }
 
-    function createBound (
-            uint boundId, 
+    function createBond (
+            uint bondId, 
             uint tokenId, 
             address tokenAddress, 
             uint tokenAmount,
             uint discountMul,
             uint discountDiv
     ) public notReverted {
-        Discounts memory disc = discounts[boundId];
+        Discounts memory disc = discounts[bondId];
         AllowedTokens memory tok = allowedTokens[tokenId];
         require(tok.token == tokenAddress, "ops");
         require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "ops");
@@ -229,20 +229,20 @@ contract Bounding {
         // optimistycally transfer gton
         require(IERC20(gton).transfer(to,amount));
 
-        UserUnlock storage user = userUnlock[msg.sender][boundId];
+        UserUnlock storage user = userUnlock[msg.sender][bondId];
         uint currentUnlock = user.delta * (block.number - user.startBlock) / user.amount;
         require(amount + user.rewardDebt <= currentUnlock,"not enough unlock");
         user.rewardDebt += amount;
         contractRequiredGtonBalance -= amount;
 
-        // rm this bound if it is over
+        // rm this bond if it is over
         if (amount + user.rewardDebt == currentUnlock && block.number >= user.startBlock + user.delta) {
-            userUnlock[msg.sender][boundId] = userUnlock[msg.sender][userUnlock[msg.sender].length];
+            userUnlock[msg.sender][bondId] = userUnlock[msg.sender][userUnlock[msg.sender].length];
             userUnlock[msg.sender].pop();
         }
     }
 
-    function claimBoundTotal(
+    function claimBondTotal(
         address to
     ) public notReverted {
         // optimistycally transfer gton
@@ -257,7 +257,7 @@ contract Bounding {
         require(IERC20(gton).transfer(to,accamulatedAmount));
         contractRequiredGtonBalance -= accamulatedAmount;
 
-        // rm  bounds if they are over
+        // rm  bonds if they are over
         for(uint i = 0; i < user.length;) {
             if (block.number >= user[i].startBlock + user[i].delta) {
                 userUnlock[msg.sender][i] = userUnlock[msg.sender][userUnlock[msg.sender].length];

@@ -34,7 +34,7 @@ interface ICan {
     );
 }
 
-contract Bounding is IERC20 {
+contract Bonding is IERC20 {
     IWETH public eth;
     IERC20 public gton;
     address public treasury;
@@ -188,15 +188,15 @@ contract Bounding is IERC20 {
             / gtonPriceUSD / int256(uint(tokenDecimals)) / int256(discountDiv));
     }
 
-    function createBound (
-            uint boundId, 
+    function createBond (
+            uint bondId, 
             uint tokenId, 
             address tokenAddress, 
             uint tokenAmount,
             uint discountMul,
             uint discountDiv
     ) public notReverted {
-        Discounts memory disc = discounts[boundId];
+        Discounts memory disc = discounts[bondId];
         AllowedTokens memory tok = allowedTokens[tokenId];
         require(tok.token == tokenAddress, "ops");
         require(disc.discountMul == discountMul && disc.discountDiv == discountDiv, "ops");
@@ -230,7 +230,7 @@ contract Bounding is IERC20 {
         contractRequiredGtonShare += share;
     }
 
-    function createBoundByAdmin (
+    function createBondByAdmin (
             uint amount,
             uint delta,
             address _user
@@ -279,7 +279,7 @@ contract Bounding is IERC20 {
         }
     }
 
-    function claimBoundTotal(address to) public notReverted {
+    function claimBondTotal(address to) public notReverted {
         uint accamulatedAmount = accamulateUserRewards(msg.sender);
         staking.transferShare(to,accamulatedAmount);
         contractRequiredGtonShare -= accamulatedAmount;
@@ -306,21 +306,21 @@ contract Bounding is IERC20 {
     }
     function approve(address spender, uint value) public returns (bool) {
         emit Approval(msg.sender,spender,value);
-        claimBoundTotal(msg.sender);
+        claimBondTotal(msg.sender);
         (, bytes memory result) = 
             address(staking).delegatecall(abi.encodeWithSignature("approve(address,uint)", spender, value));
         return abi.decode(result, (bool));
     }
     function transfer(address to, uint value) public returns (bool) {
         emit Transfer(msg.sender,to,value);
-        claimBoundTotal(msg.sender);
+        claimBondTotal(msg.sender);
         (, bytes memory result) = 
             address(staking).delegatecall(abi.encodeWithSignature("transfer(address,uint)", to, value));
         return abi.decode(result, (bool));
     }
     function transferFrom(address from, address to, uint value) public returns (bool) {
         emit Transfer(from,to,value);
-        claimBoundTotal(msg.sender);
+        claimBondTotal(msg.sender);
         (, bytes memory result) = 
             address(staking).delegatecall(abi.encodeWithSignature("transferFrom(address,address,uint)",from, to, value));
         return abi.decode(result, (bool));
@@ -328,13 +328,13 @@ contract Bounding is IERC20 {
     function mint(uint _amount, address _to) public {
         gton.transferFrom(msg.sender,address(this),_amount);
         gton.approve(address(staking),_amount);
-        claimBoundTotal(msg.sender);
+        claimBondTotal(msg.sender);
         staking.mint(_amount,_to);
         emit Transfer(address(0),_to,_amount);
     }
     function burn(address _to, uint256 _share) public {
         emit Transfer(msg.sender,address(0),staking.shareToBalance(_share));
-        claimBoundTotal(msg.sender);
+        claimBondTotal(msg.sender);
         address(staking).delegatecall(abi.encodeWithSignature("burn(address,uint256)",_to, _share));
     }
 }
