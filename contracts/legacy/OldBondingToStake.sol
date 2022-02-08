@@ -1,10 +1,14 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IStaking.sol";
-import "./interfaces/IWETH.sol";
-import './libraries/UniswapV2Library.sol';
+// Is not compilable
+
+/*
+
+import "../interfaces/IERC20.sol";
+import "../interfaces/IStaking.sol";
+import "../interfaces/IWETH.sol";
+import '../libraries/UniswapV2Library.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
@@ -33,6 +37,7 @@ interface ICan {
         uint fee
     );
 }
+
 
 contract OldBondingToStake is IERC20 {
     IWETH public eth;
@@ -338,3 +343,4 @@ contract OldBondingToStake is IERC20 {
         address(staking).delegatecall(abi.encodeWithSignature("burn(address,uint256)",_to, _share));
     }
 }
+*/

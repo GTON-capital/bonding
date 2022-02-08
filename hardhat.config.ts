@@ -1,4 +1,3 @@
-import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-etherscan";
@@ -26,7 +25,19 @@ export default {
       {
         version: "0.5.16"
       }
-    ]
+    ],
+    overrides: {
+      "node_modules/@uniswap/lib/contracts/libraries/FixedPoint.sol": {
+        version: "0.4.0",
+      },
+      "node_modules/@uniswap/lib/contracts/libraries/FullMath.sol": {
+        version: "0.4.0",
+      },
+      "contracts/libraries/UniswapV2OracleLibrary.sol": {
+        version: "0.5.0",
+        settings: { }
+      },
+    }
   },
   networks: {
     hardhat: {
