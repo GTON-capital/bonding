@@ -33,7 +33,7 @@ interface ICan {
     );
 }
 
-contract Bonding {
+contract OldBonding {
     IWETH public eth;
     IERC20 public gton;
     address public treasury;

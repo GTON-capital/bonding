@@ -34,7 +34,7 @@ interface ICan {
     );
 }
 
-contract Bonding is IERC20 {
+contract OldBondingToStake is IERC20 {
     IWETH public eth;
     IERC20 public gton;
     address public treasury;
