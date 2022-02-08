@@ -1,9 +1,13 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./interfaces/IERC20.sol";
-import "./interfaces/IWETH.sol";
-import './libraries/UniswapV2Library.sol';
+// Is not compilable
+
+/*
+
+import "../interfaces/IERC20.sol";
+import "../interfaces/IWETH.sol";
+import '../libraries/UniswapV2Library.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
@@ -32,6 +36,7 @@ interface ICan {
         uint fee
     );
 }
+
 
 contract OldBonding {
     IWETH public eth;
@@ -267,4 +272,4 @@ contract OldBonding {
             }
         }
     }
-}
+} */
