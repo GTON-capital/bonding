@@ -2,8 +2,15 @@
 pragma solidity >=0.8.0;
 
 interface IBondingClaimer {
-    event Burn(address indexed tokenId, address indexed user);
-    event MintData(address indexed asset, uint allocation, uint release, string bondType);
+    /**
+     * @dev Emitted when `user` claims `tokenId` bond.
+     */
+    event Claim(address indexed user, uint tokenId);
 
+    /**
+     * @dev Releases sGTON token for user by it's `tokenId`.
+     
+     * Emits {Claim} event.
+     */
     function claim(uint tokenId) external;
 }
