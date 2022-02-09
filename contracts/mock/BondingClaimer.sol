@@ -2,12 +2,23 @@
 pragma solidity >=0.8.0;
 
 import {IBondingClaimer} from "../interfaces/IBondingClaimer.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IBondStorage} from "../interfaces/IBondStorage.sol";
 
-contract MockBondingClaimer is IBondingClaimer {
-    
-    IERC721 bondStorage;
+contract BondingClaimer is IBondingClaimer {
 
+    constructor(IBondStorage _bondStorage) {
+        bondStorage = _bondStorage;
+    }
+
+    /* ========== CONSTANTS ========== */
+    uint immutable bondLimit;
+    IBondStorage immutable bondStorage;
+
+    /* ========== STATE VARIABLES ========== */
+
+    /* ========== VIEWS ========== */
+
+    /* ========== MUTATIVE FUNCTIONS ========== */
     function claim(uint tokenId) public override {
 
     }
