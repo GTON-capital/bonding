@@ -11,10 +11,9 @@ contract BondingClaimer is IBondingClaimer {
     }
 
     /* ========== CONSTANTS ========== */
-    uint immutable bondLimit;
-    IBondStorage immutable bondStorage;
 
     /* ========== STATE VARIABLES ========== */
+    IBondStorage bondStorage;
 
     /* ========== VIEWS ========== */
 

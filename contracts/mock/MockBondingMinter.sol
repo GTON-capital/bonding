@@ -13,11 +13,12 @@ contract MockBondingMinter is IBondingMinter, Ownable {
     }
 
     /* ========== CONSTANTS ========== */
-    uint immutable bondLimit;
-    IBondStorage immutable bondStorage;
 
     /* ========== STATE VARIABLES ========== */
 
+    uint bondLimit;
+    IBondStorage bondStorage;
+    
     /* ========== VIEWS ========== */
 
     function totalSupply() public view override returns(uint) {
