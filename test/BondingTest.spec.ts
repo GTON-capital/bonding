@@ -14,9 +14,14 @@ describe("Bonding", function () {
         this.dev = this.signers[3]
         this.minter = this.signers[4]
     
-        this.BigBanger = await ethers.getContractFactory("BoundingClaimer")
-        this.relictToken = await ethers.getContractFactory("BoundingMinter")
-        this.ERC20Mock = await ethers.getContractFactory("ERC20Mock", this.minter)
+        this.Claimer = await ethers.getContractFactory("MockBoundingClaimer")
+        this.Minter = await ethers.getContractFactory("MockBoundingMinter")
+        this.Storage = await ethers.getContractFactory("MockBoundStorage")
     })
+
+    beforeEach(async function () {
+        this.relict = await this.RelictGtonToken.deploy()
+        await this.relict.deployed()
+      })
 
 });

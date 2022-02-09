@@ -12,10 +12,11 @@ contract BondingMinter is IBondingMinter {
     }
 
     /* ========== CONSTANTS ========== */
-    uint immutable bondLimit;
-    IBondStorage immutable bondStorage;
 
     /* ========== STATE VARIABLES ========== */
+
+    uint bondLimit;
+    IBondStorage bondStorage;
 
     /* ========== VIEWS ========== */
 
