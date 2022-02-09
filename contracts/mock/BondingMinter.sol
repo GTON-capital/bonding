@@ -2,19 +2,19 @@
 pragma solidity ^0.8.0;
 
 import {IBondingMinter} from "../interfaces/IBondingMinter.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IBondStorage} from "../interfaces/IBondStorage.sol";
 
 contract MockBondingMinter is IBondingMinter, Ownable {
 
-    constructor(uint _bondLimit,IERC721 _bondStorage) {
+    constructor(uint _bondLimit, IBondStorage _bondStorage) {
         bondLimit = _bondLimit;
         bondStorage = _bondStorage;
     }
 
     /* ========== CONSTANTS ========== */
     uint immutable bondLimit;
-    IERC721 immutable bondStorage;
+    IBondStorage immutable bondStorage;
 
     /* ========== STATE VARIABLES ========== */
 
@@ -28,6 +28,7 @@ contract MockBondingMinter is IBondingMinter, Ownable {
     function mint() public payable override returns(uint) {
 
     }
+    
     function startBonding() public override {
 
     }
