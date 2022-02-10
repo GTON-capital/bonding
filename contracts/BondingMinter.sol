@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {IBondingMinter} from "./interfaces/IBondingMinter.sol";
-import {IBondStorage} from "./interfaces/IBondStorage.sol";
+import { IBondingMinter } from "./interfaces/IBondingMinter.sol";
+import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 contract BondingMinter is IBondingMinter {
 
@@ -14,7 +14,7 @@ contract BondingMinter is IBondingMinter {
 
     /* ========== MODIFIERS  ========== */
 
-    modifier mintPeriod() {
+    modifier mintEnabled() {
         require(block.timestamp <= lastBondActivation && block.timestamp <= bondExpiration(), 
             "BondingMinter: Mint is not available in this period");
         _;
@@ -23,7 +23,7 @@ contract BondingMinter is IBondingMinter {
     /* ========== CONSTANTS ========== */
 
     /* ========== STATE VARIABLES ========== */
-    
+
     uint lastBondActivation;
     uint bondPeriod;
     uint bondLimit;

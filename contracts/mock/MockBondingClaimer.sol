@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {IBondingClaimer} from "../interfaces/IBondingClaimer.sol";
-import {IBondStorage} from "../interfaces/IBondStorage.sol";
+import { IBondingClaimer } from "../interfaces/IBondingClaimer.sol";
+import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 contract BondingClaimer is IBondingClaimer {
 
