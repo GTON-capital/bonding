@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IBondingMinter} from "../interfaces/IBondingMinter.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IBondStorage} from "../interfaces/IBondStorage.sol";
+import { IBondingMinter } from "../interfaces/IBondingMinter.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 contract MockBondingMinter is IBondingMinter, Ownable {
 
