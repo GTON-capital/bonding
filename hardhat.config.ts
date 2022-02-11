@@ -35,7 +35,7 @@ const config: HardhatUserConfig = {
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     currency: "USD",
     enabled: process.env.REPORT_GAS === "true",
-    excludeContracts: ["contracts/mocks/", "contracts/libraries/"],
+    excludeContracts: ["contracts/libraries/"],
   },
   mocha: {
     timeout: 20000,
