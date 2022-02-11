@@ -39,12 +39,13 @@ contract MockBondingMinter is IBondingMinter, Ownable {
     uint lastBondActivation;
     uint bondPeriod;
     uint bondLimit;
+    uint bondCounter;
     IBondStorage bondStorage;
     AggregatorV3Interface aggregator;
-
+    mapping(uint => address) userBond;
     /* ========== VIEWS ========== */
 
-    function bondExpiration() internal view returns(uint) {
+    function bondExpiration() public view returns(uint) {
         return lastBondActivation + bondPeriod;
     }
 
@@ -53,7 +54,7 @@ contract MockBondingMinter is IBondingMinter, Ownable {
     }
 
     function totalSupply() public view override returns(uint) {
-        
+        return bondCounter;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -65,6 +66,7 @@ contract MockBondingMinter is IBondingMinter, Ownable {
 
     function mint() public payable override mintEnabled returns(uint) {
         uint id = bondStorage.mint(msg.sender);
+        bondCounter++;
         return id;
     }
 

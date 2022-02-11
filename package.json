@@ -1,5 +1,5 @@
 {
-  "name": "hardhat-project",
+  "name": "gton-bonding-evm",
   "devDependencies": {
     "@boringcrypto/boring-solidity": "boringcrypto/BoringSolidity#e06e943",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
