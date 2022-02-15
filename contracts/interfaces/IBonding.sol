@@ -26,10 +26,17 @@ interface IBonding is IERC721Receiver {
      */
     event MintData(address indexed asset, uint allocation, uint releaseDate, string bondType);
 
-        /**
+    /**
      * @dev Emitted when `user` claims `tokenId` bond.
      */
     event Claim(address indexed user, uint tokenId);
+
+    /**
+     * @dev Function calculates amount of token out
+     * Params:
+     * - amountIn - token amount to be spended by user
+     */
+    function bondAmountOut(uint amountIn) external view returns(uint amountOut);
 
     /**
      * @dev Starts bonding period.
@@ -45,10 +52,12 @@ interface IBonding is IERC721Receiver {
 
     /**
      * @dev Mints new token for message sender.
-     * 
+     * Params:
+     * - amount - the amount user wants to spend
+     *
      * Emits {Mint} and {MintData} events
      */
-    function mint() external payable returns (uint tokenId);
+    function mint(uint amount) external payable returns (uint tokenId);
 
     /**
      * @dev Releases sGTON token for user by it's `tokenId`.
