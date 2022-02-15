@@ -5,8 +5,7 @@ import { timestampSetter, blockGetter } from "./shared/utils"
 
 import { MockBondStorage } from "../types/MockBondStorage"
 import { MockAggregator } from "../types/MockAggregator"
-import { MockBondingClaimer } from "../types/MockBondingClaimer"
-import { MockBondingMinter } from "../types/MockBondingMinter"
+import { MockBonding } from "../types/MockBonding"
 
 use(solidity)
 
@@ -21,19 +20,16 @@ describe("Bonding", function () {
     const setTimestamp = timestampSetter(waffle.provider)
     const getLastTS = blockGetter(waffle.provider, "timestamp")
 
-    let BondClaimer: any
     let BondMinter: any
     let BondStorage: any
     let Aggregator: any
 
     let storage: MockBondStorage;
     let agg: MockAggregator;
-    let minter: MockBondingMinter;
-    let claimer: MockBondingClaimer;
+    let minter: MockBonding;
 
     before(async () => {
-        BondClaimer = await ethers.getContractFactory("MockBondingClaimer")
-        BondMinter = await ethers.getContractFactory("MockBondingMinter")
+        BondMinter = await ethers.getContractFactory("MockBonding")
         BondStorage = await ethers.getContractFactory("MockBondStorage")
         Aggregator = await ethers.getContractFactory("MockAggregator")
     })
@@ -41,7 +37,7 @@ describe("Bonding", function () {
     beforeEach(async function () {
         storage = await BondStorage.deploy("BondStorage", "BondS") as MockBondStorage;
         agg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
-        minter = await BondMinter.deploy(bondLimit, bondPeriods.quarter, storage.address, agg.address) as MockBondingMinter;
+        minter = await BondMinter.deploy(bondLimit, bondPeriods.quarter, storage.address, agg.address) as MockBonding;
         await storage.transferOwnership(minter.address)
       })
 
