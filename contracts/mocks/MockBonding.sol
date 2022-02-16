@@ -5,8 +5,7 @@ import { IBonding } from "../interfaces/IBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
-import { UintArray } from "sol-utils/contracts/libraries/UintArray.sol";
+import { Staking } from "@gton/staking/contracts/Staking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -25,7 +24,8 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        IStaking _sgton
+        Staking _sgton,
+        string memory _bondType
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
@@ -37,6 +37,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         token = _token;
         gton = _gton;
         sgton = _sgton;
+        bondType = _bondType;
     }
 
     /* ========== MODIFIERS  ========== */
@@ -53,11 +54,11 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
     /* ========== CONSTANTS ========== */
 
-    uint immutable calcDecimals = 1e12;
     uint immutable discountDenominator = 10000;
-    uint immutable bondType = "7d";
+
     /* ========== STATE VARIABLES ========== */
 
+    string bondType;
     uint lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
     uint bondActivePeriod;
@@ -66,21 +67,39 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
     uint bondLimit;
     uint bondCounter;
     uint discountNominator;
-    uint[] activeBonds;
+    mapping (uint => BondData) activeBonds;
+
+    struct BondData {
+        bool isActive;
+        uint issueTimestamp;
+        uint releaseTimestamp;
+        string bondType;
+        uint releaseAmount;
+    }
 
     ERC20 token;
     ERC20 gton;
-    IStaking sgton;
+    Staking sgton;
     IBondStorage bondStorage;
     AggregatorV3Interface tokenAggregator;
     AggregatorV3Interface gtonAggregator;
 
-    mapping(uint => address) userBond;
-
     /* ========== VIEWS ========== */
 
     function isActiveBond(uint id) public view returns(bool) {
-        return UintArray.indexOf(activeBonds, id) >= 0;
+        return activeBonds[id].isActive;
+    }
+
+    /**
+     * Function calculates amount of token to be earned with the `amount` by the bond duration time
+     */
+    function getStakingReward(uint amount) public view returns(uint) {
+        uint stakingN = sgton.aprBasisPoints();
+        uint stakingD = sgton.aprDenominator();
+        uint calcDecimals = sgton.calcDecimals();
+        uint secondsInYear = sgton.secondsInYear();
+        uint yearEarn = amount * calcDecimals * stakingN / stakingD;
+        return yearEarn * bondToClaimPeriod / secondsInYear / calcDecimals; 
     }
 
     /**
@@ -148,18 +167,21 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         lastBondActivation = block.timestamp;
     }
 
-    function _mint(uint amount, address user, string memory _bondType) internal returns(uint) {
+    function _mint(uint amount, address user, string memory _bondType) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
-        require(token.transferFrom(msg.sender, address(this), amount), "Bonding: Insufficient approve");
+        require(token.transferFrom(user, address(this), amount), "Bonding: Insufficient approve amount");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
+        uint reward = getStakingReward(sgtonAmount);
+        uint bondReward = sgtonAmount + reward;
+        uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
+        id = bondStorage.mint(user);
 
-        uint id = bondStorage.mint(msg.sender);
-        activeBonds.push(id);
+        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
 
         bondCounter++;
-        emit Mint(id, msg.sender);
-        emit MintData(token, amountWithoutDis, releaseTimestamp, _bondType);
+        emit Mint(id, user);
+        emit MintData(address(token), bondReward, releaseTimestamp, _bondType);
     }
 
     /**

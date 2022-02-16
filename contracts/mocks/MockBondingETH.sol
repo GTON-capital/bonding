@@ -24,7 +24,8 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        Staking _sgton
+        Staking _sgton,
+        string memory _bondType
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
@@ -36,6 +37,7 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
         token = _token;
         gton = _gton;
         sgton = _sgton;
+        bondType = _bondType;
     }
 
     /* ========== MODIFIERS  ========== */
@@ -52,12 +54,11 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
 
     /* ========== CONSTANTS ========== */
 
-    uint immutable calcDecimals = 1e12;
     uint immutable discountDenominator = 10000;
-    uint immutable bondType = "7d";
 
     /* ========== STATE VARIABLES ========== */
 
+    string bondType;
     uint lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
     uint bondActivePeriod;
@@ -86,17 +87,19 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
     /* ========== VIEWS ========== */
 
     function isActiveBond(uint id) public view returns(bool) {
-        return activeBonds.isActive;
+        return activeBonds[id].isActive;
     }
 
     /**
      * Function calculates amount of token to be earned with the `amount` by the bond duration time
      */
-    function stakingEarn(uint amount) public view returns(uint) {
-        uint stakingN = sgton.aprBasisPoints;
-        uint stakingD = sgton.aprDenominator;
-        uint calcDecimals = sgton.calcDecimals;
-        return amount * stakingN / stakingD; // @TODO
+    function getStakingReward(uint amount) public view returns(uint) {
+        uint stakingN = sgton.aprBasisPoints();
+        uint stakingD = sgton.aprDenominator();
+        uint calcDecimals = sgton.calcDecimals();
+        uint secondsInYear = sgton.secondsInYear();
+        uint yearEarn = amount * calcDecimals * stakingN / stakingD;
+        return yearEarn * bondToClaimPeriod / secondsInYear / calcDecimals; 
     }
 
     /**
@@ -164,20 +167,21 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
         lastBondActivation = block.timestamp;
     }
 
-    function _mint(uint amount, address user, string memory _bondType) internal returns(uint) {
+    function _mint(uint amount, address user, string memory _bondType) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
-        uint sgtonWithStaking = stakedAmount(sgtonAmount);
+        uint reward = getStakingReward(sgtonAmount);
+        uint bondReward = sgtonAmount + reward;
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
-        uint id = bondStorage.mint(msg.sender);
+        id = bondStorage.mint(user);
 
-        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, sgtonWithStaking);
+        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
 
         bondCounter++;
-        emit Mint(id, msg.sender);
-        emit MintData(token, amountWithoutDis, releaseTimestamp, _bondType);
+        emit Mint(id, user);
+        emit MintData(address(token), bondReward, releaseTimestamp, _bondType);
     }
 
     /**

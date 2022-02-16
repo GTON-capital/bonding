@@ -14,7 +14,7 @@ interface IBonding is IERC721Receiver {
     /**
      * @dev Emitted when the bond is minted for `user` with `tokenId` id. 
      */
-    event Mint(address indexed tokenId, address indexed user);
+    event Mint(uint indexed tokenId, address indexed user);
 
     /**
      * @dev Emitted when the bond is minted. 
