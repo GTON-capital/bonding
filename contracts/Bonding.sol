@@ -12,7 +12,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract MockBondingETH is IBonding, Ownable, ERC721Holder {
+contract Bonding is IBonding, Ownable, ERC721Holder {
 
     constructor(
         uint _bondLimit, 

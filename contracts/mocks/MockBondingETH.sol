@@ -5,7 +5,7 @@ import { IBonding } from "../interfaces/IBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
+import { Staking } from "@gton/staking/contracts/Staking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -18,20 +18,22 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
         uint _bondLimit, 
         uint _bondActivePeriod, 
         uint _bondToClaimPeriod, 
+        uint _discountNominator,
         IBondStorage _bondStorage, 
         AggregatorV3Interface _tokenAggregator,
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        IStaking _sgton
+        Staking _sgton
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
         bondToClaimPeriod = _bondToClaimPeriod;
+        discountNominator = _discountNominator;
         bondStorage = _bondStorage;
         tokenAggregator = _tokenAggregator;
         gtonAggregator = _gtonAggregator;
-        tokenAddress = _token;
+        token = _token;
         gton = _gton;
         sgton = _sgton;
     }
@@ -44,7 +46,7 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
      */
     modifier mintEnabled() {
         require(isBondingActive(), 
-            "BondingMinter: Mint is not available in this period");
+            "Bonding: Mint is not available in this period");
         _;
     }
 
@@ -52,6 +54,7 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
 
     uint immutable calcDecimals = 1e12;
     uint immutable discountDenominator = 10000;
+    uint immutable bondType = "7d";
 
     /* ========== STATE VARIABLES ========== */
 
@@ -62,17 +65,39 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
     uint bondToClaimPeriod;
     uint bondLimit;
     uint bondCounter;
+    uint discountNominator;
+    mapping (uint => BondData) activeBonds;
 
-    ERC20 tokenAddress;
+    struct BondData {
+        bool isActive;
+        uint issueTimestamp;
+        uint releaseTimestamp;
+        string bondType;
+        uint releaseAmount;
+    }
+
+    ERC20 token;
     ERC20 gton;
-    IStaking sgton;
+    Staking sgton;
     IBondStorage bondStorage;
     AggregatorV3Interface tokenAggregator;
     AggregatorV3Interface gtonAggregator;
 
-    mapping(uint => address) userBond;
-
     /* ========== VIEWS ========== */
+
+    function isActiveBond(uint id) public view returns(bool) {
+        return activeBonds.isActive;
+    }
+
+    /**
+     * Function calculates amount of token to be earned with the `amount` by the bond duration time
+     */
+    function stakingEarn(uint amount) public view returns(uint) {
+        uint stakingN = sgton.aprBasisPoints;
+        uint stakingD = sgton.aprDenominator;
+        uint calcDecimals = sgton.calcDecimals;
+        return amount * stakingN / stakingD; // @TODO
+    }
 
     /**
      * View function returns timestamp when bond period vill be over
@@ -84,19 +109,34 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
     /**
      * Function that returns data from aggregator
      */
-    function tokenPriceAndDecimals(AggregatorV3Interface token) internal view returns (int256 price, uint decimals) {
-        decimals = token.decimals();
-        (, price,,,) = token.latestRoundData();
+    function tokenPriceAndDecimals(AggregatorV3Interface _token) internal view returns (int256 price, uint decimals) {
+        decimals = _token.decimals();
+        (, price,,,) = _token.latestRoundData();
     }
 
     /**
-     * Function calculates the amount of token to be locked for the bond
+     * Function calculates the amount of gton out for current price without discount
      */
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
         (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
         uint tokenInUSD = amountIn * uint(tokenPrice)  / tokenDecimals;
         amountOut = tokenInUSD / uint(gtonPrice) / gtonDecimals;
+    }
+
+    /**
+     * Function calculates the  amount of token that represents
+     */
+    function amountWithoutDiscount(uint amount) public view returns (uint) {
+        // to keep contract representation correctly
+        uint givenPercent = discountDenominator - discountNominator;
+        /**
+            For example:
+            discount - 25%
+            givenPercent = 100-25 = 75
+            amountWithoutDiscount = amount / 75 * 100
+         */
+        return amount * discountDenominator / givenPercent;
     }
 
     /**
@@ -120,19 +160,31 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
      * Function starts issue bonding period
      */
     function startBonding() public override onlyOwner {
-        require(!isBondingActive(), "BondingMinter: Bonding is already active");
+        require(!isBondingActive(), "Bonding: Bonding is already active");
         lastBondActivation = block.timestamp;
+    }
+
+    function _mint(uint amount, address user, string memory _bondType) internal returns(uint) {
+        require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
+        require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
+        uint amountWithoutDis = amountWithoutDiscount(amount);
+        uint sgtonAmount = bondAmountOut(amountWithoutDis);
+        uint sgtonWithStaking = stakedAmount(sgtonAmount);
+        uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
+        uint id = bondStorage.mint(msg.sender);
+
+        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, sgtonWithStaking);
+
+        bondCounter++;
+        emit Mint(id, msg.sender);
+        emit MintData(token, amountWithoutDis, releaseTimestamp, _bondType);
     }
 
     /**
      * Function issues bond to user by minting the NFT token for them.
-     * 
      */
-    function mint(uint amount) public payable mintEnabled returns(uint) {
-        require(bondLimit > bondCounter, "BondMinter: Exceeded amount of bonds");
-        uint id = bondStorage.mint(msg.sender);
-        bondCounter++;
-        return id;
+    function mint(uint amount) public payable mintEnabled returns(uint id) {
+        id = _mint(amount, msg.sender, bondType);
     }
 
     /**
@@ -142,5 +194,13 @@ contract MockBondingETH is IBonding, Ownable, ERC721Holder {
     function claim(uint tokenId) public override {
 
     }
+
+     /* ========== RESTRICTED ========== */
+
+    function mintFor(uint amount, address user, string memory _bondType) public payable onlyOwner returns(uint id) {
+        id = _mint(amount, user, _bondType);
+    }
+
+    // @TODO: add state changers 
 
 }
