@@ -54,20 +54,20 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
 
     /* ========== CONSTANTS ========== */
 
-    uint constant discountDenominator = 10000;
+    uint constant public discountDenominator = 10000;
 
     /* ========== STATE VARIABLES ========== */
 
-    bytes bondType;
-    uint lastBondActivation;
+    bytes public bondType;
+    uint public lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
-    uint bondActivePeriod;
+    uint public bondActivePeriod;
     // Amount in ms. Bond will be available to claim after this period of time
-    uint bondToClaimPeriod;
-    uint bondLimit;
-    uint bondCounter;
-    uint discountNominator;
-    mapping (uint => BondData) activeBonds;
+    uint public bondToClaimPeriod;
+    uint public bondLimit;
+    uint public bondCounter;
+    uint public discountNominator;
+    mapping (uint => BondData) public activeBonds;
 
     struct BondData {
         bool isActive;
@@ -77,12 +77,12 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
         uint releaseAmount;
     }
 
-    ERC20 immutable token;
-    ERC20 immutable  gton;
-    Staking immutable sgton;
-    IBondStorage immutable bondStorage;
-    AggregatorV3Interface tokenAggregator;
-    AggregatorV3Interface gtonAggregator;
+    ERC20 immutable public token;
+    ERC20 immutable  public gton;
+    Staking immutable public sgton;
+    IBondStorage immutable public bondStorage;
+    AggregatorV3Interface public tokenAggregator;
+    AggregatorV3Interface public gtonAggregator;
 
     /* ========== VIEWS ========== */
 

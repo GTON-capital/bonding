@@ -5,7 +5,7 @@ import { timestampSetter, blockGetter, expandTo18Decimals } from "./shared/utils
 
 import { MockBondStorage } from "../types/MockBondStorage"
 import { MockAggregator } from "../types/MockAggregator"
-import { MockBonding } from "../types/MockBonding"
+import { MockBondingETH } from "../types/MockBondingETH"
 import { MockERC20 } from "../types/MockERC20"
 import { MockStaking } from "../types/MockStaking"
 import { BigNumber, ContractReceipt } from "ethers"
@@ -34,7 +34,7 @@ describe("Bonding", function () {
     let storage: MockBondStorage;
     let gtonAgg: MockAggregator;
     let tokenAgg: MockAggregator;
-    let bonding: MockBonding;
+    let bonding: MockBondingETH;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
@@ -59,7 +59,7 @@ describe("Bonding", function () {
             token.address, 
             gton.address,
             sgton.address,
-            "7d") as MockBonding;
+            ethers.utils.formatBytes32String("7d")) as MockBondingETH;
     } 
 
     beforeEach(async function () {
@@ -72,6 +72,7 @@ describe("Bonding", function () {
         bonding = await deployDefaultBonding()
         await bonding.startBonding();
         await storage.transferOwnership(bonding.address)
+        await gton.mint(bonding.address, expandTo18Decimals(500000))
       })
     
     const sampleAmount = expandTo18Decimals(10);
@@ -109,22 +110,44 @@ describe("Bonding", function () {
 
     it("owner can mint for anyone", async () => {
         const amount = expandTo18Decimals(150);
-        await expect(bonding.connect(alice).mintFor(amount, alice.address, "VC")).to.be.revertedWith("Ownable: caller is not the owner");
-        const tx = await bonding.mintFor(amount, alice.address, "VC", {value: amount});
+        const type = ethers.utils.formatBytes32String("VC")
+        await expect(bonding.connect(alice).mintFor(amount, alice.address, type)).to.be.revertedWith("Ownable: caller is not the owner");
+        const tx = await bonding.mintFor(amount, alice.address, type, {value: amount});
         const id = extractTokenId(await tx.wait())
         expect(alice.address).to.eq(await storage.ownerOf(id));
         expect(await bonding.isActiveBond(id)).to.eq(true);
     })
 
     it("Can mint and claim after the bond period", async () => {
-
+        const amount = expandTo18Decimals(100)
+        const tx = await bonding.mint(amount, {value: amount});
+        const rc = await tx.wait();
+        const id = extractTokenId(rc);
+        const data = await bonding.activeBonds(id);
+        await storage.approve(bonding.address, id);
+        await expect(bonding.claim(id)).to.be.revertedWith("Bonding: Bond is locked to claim now");
+        await setTimestamp(data.releaseTimestamp.toNumber())
+        await bonding.claim(id);
     })
-    
+
+    it("Cannot claim bond that does not exist", async () => {
+        await expect(bonding.claim(0)).to.be.revertedWith("Bonding: Cannot claim inactive bond");
+    })
+
     it("can transfer token and then claim", async () => {
-
+        const amount = expandTo18Decimals(100)
+        const tx = await bonding.mint(amount, {value: amount});
+        const rc = await tx.wait();
+        const id = extractTokenId(rc);
+        const data = await bonding.activeBonds(id);
+        await storage.transfer(alice.address, id);
+        await storage.connect(alice).approve(bonding.address, id);
+        await expect(bonding.connect(alice).claim(id)).to.be.revertedWith("Bonding: Bond is locked to claim now");
+        await setTimestamp(data.releaseTimestamp.toNumber())
+        await bonding.connect(alice).claim(id);
     })
 
-    it("", async () => {
+    it("Access functions check", async () => {
 
     })
 });

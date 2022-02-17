@@ -24,4 +24,9 @@ contract MockBondStorage is IBondStorage,ERC721Burnable,Ownable {
         tokenCounter++;
     }
 
+    function transfer(address to, uint tokenId) public {
+        require(_isApprovedOrOwner(msg.sender, tokenId), "BondStorage: You are not the owner");
+        _transfer(msg.sender, to, tokenId);
+    }
+
 }
