@@ -40,17 +40,6 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 20000,
   },
-  namedAccounts: {
-    deployer: {
-      default: 0,
-    },
-    dev: {
-      // Default to 1
-      default: 2,
-      // dev address mainnet
-      // 1: "",
-    },
-  },
   networks: {
   /*  mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
