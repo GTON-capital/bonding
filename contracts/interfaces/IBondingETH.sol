@@ -3,7 +3,8 @@ pragma solidity >=0.8.0;
 
 import { IBasicBonding } from "./IBasicBonding.sol";
 
-interface IBonding is IBasicBonding {
+interface IBondingETH is IBasicBonding {
+
     /**
      * @dev Mints new token for message sender.
      * Params:
@@ -11,6 +12,6 @@ interface IBonding is IBasicBonding {
      *
      * Emits {Mint} and {MintData} events
      */
-    function mint(uint amount) external returns (uint tokenId);
+    function mint(uint amount) external payable returns (uint tokenId);
 
 }

@@ -116,6 +116,10 @@ describe("Bonding", function () {
         expect(await bonding.isActiveBond(id)).to.eq(true);
     })
 
+    it("Can mint and claim after the bond period", async () => {
+
+    })
+    
     it("can transfer token and then claim", async () => {
 
     })

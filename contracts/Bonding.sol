@@ -12,7 +12,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract MockBonding is IBonding, Ownable, ERC721Holder {
+contract Bonding is IBonding, Ownable, ERC721Holder {
 
     constructor(
         uint _bondLimit, 
@@ -25,7 +25,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
-        string memory _bondType
+        bytes memory _bondType
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
@@ -54,11 +54,11 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
     /* ========== CONSTANTS ========== */
 
-    uint immutable discountDenominator = 10000;
+    uint constant discountDenominator = 10000;
 
     /* ========== STATE VARIABLES ========== */
 
-    string bondType;
+    bytes bondType;
     uint lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
     uint bondActivePeriod;
@@ -73,14 +73,14 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         bool isActive;
         uint issueTimestamp;
         uint releaseTimestamp;
-        string bondType;
+        bytes bondType;
         uint releaseAmount;
     }
 
-    ERC20 token;
-    ERC20 gton;
-    Staking sgton;
-    IBondStorage bondStorage;
+    ERC20 immutable token;
+    ERC20 immutable  gton;
+    Staking immutable sgton;
+    IBondStorage immutable bondStorage;
     AggregatorV3Interface tokenAggregator;
     AggregatorV3Interface gtonAggregator;
 
@@ -159,17 +159,9 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    /**
-     * Function starts issue bonding period
-     */
-    function startBonding() public override onlyOwner {
-        require(!isBondingActive(), "Bonding: Bonding is already active");
-        lastBondActivation = block.timestamp;
-    }
-
-    function _mint(uint amount, address user, string memory _bondType) internal returns(uint id) {
+    function _mint(uint amount, address user, bytes memory _bondType) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
-        require(token.transferFrom(user, address(this), amount), "Bonding: Insufficient approve amount");
+        token.transferFrom(msg.sender, address(this), amount);
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
         uint reward = getStakingReward(sgtonAmount);
@@ -187,24 +179,59 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public payable mintEnabled returns(uint id) {
+    function mint(uint amount) public mintEnabled returns(uint id) {
         id = _mint(amount, msg.sender, bondType);
     }
 
     /**
      * Function receives the bond from user and updates users balance with sgton
-     *
      */
     function claim(uint tokenId) public override {
-
+        require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
+        bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
+        BondData storage bond = activeBonds[tokenId];
+        require(bond.releaseTimestamp <= block.timestamp, "Bonding: Bond is locked to claim now");
+        bond.isActive = false;
+        gton.approve(address(sgton), bond.releaseAmount);
+        sgton.stake(bond.releaseAmount, msg.sender);
+        emit Claim(msg.sender, tokenId);
     }
 
      /* ========== RESTRICTED ========== */
 
-    function mintFor(uint amount, address user, string memory _bondType) public payable onlyOwner returns(uint id) {
+    function mintFor(uint amount, address user, bytes memory _bondType) public payable onlyOwner returns(uint id) {
         id = _mint(amount, user, _bondType);
     }
+    
+    /**
+     * Function starts issue bonding period
+     */
+    function startBonding() public override onlyOwner {
+        require(!isBondingActive(), "Bonding: Bonding is already active");
+        lastBondActivation = block.timestamp;
+    }
 
-    // @TODO: add state changers 
+    function setGtonAggregator(AggregatorV3Interface agg) public onlyOwner {
+        gtonAggregator = agg;
+    }
 
+    function setTokenAggregator(AggregatorV3Interface agg) public onlyOwner {
+        tokenAggregator = agg;
+    }
+
+    function setDiscountNominator(uint _discountN) public onlyOwner {
+        discountNominator = _discountN;
+    }
+
+    function setBondActivePeriod(uint _bondActivePeriod) public onlyOwner {
+        bondActivePeriod = _bondActivePeriod;
+    }
+
+    function seBbondToClaimPeriod(uint _bondToClaimPeriod) public onlyOwner {
+        bondToClaimPeriod = _bondToClaimPeriod;
+    }
+
+    function setBondLimit(uint _bondLimit) public onlyOwner {
+        bondLimit = _bondLimit;
+    }
 }
