@@ -227,7 +227,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
         bondActivePeriod = _bondActivePeriod;
     }
 
-    function seBbondToClaimPeriod(uint _bondToClaimPeriod) public onlyOwner {
+    function setBondToClaimPeriod(uint _bondToClaimPeriod) public onlyOwner {
         bondToClaimPeriod = _bondToClaimPeriod;
     }
 

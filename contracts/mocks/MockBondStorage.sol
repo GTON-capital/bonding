@@ -14,7 +14,7 @@ contract MockBondStorage is IBondStorage,ERC721Burnable,Ownable {
     ) ERC721(_name, _symbol) {}
 
     /* ========== STATE VARIABLES ========== */
-    uint tokenCounter = 0;
+    uint public tokenCounter = 0;
 
     /* ========== MUTATIVE FUNCTIONS ========== */
     function mint(address to) public override onlyOwner returns(uint tokenId) {
@@ -25,7 +25,7 @@ contract MockBondStorage is IBondStorage,ERC721Burnable,Ownable {
     }
 
     function transfer(address to, uint tokenId) public {
-        require(_isApprovedOrOwner(msg.sender, tokenId), "BondStorage: You are not the owner");
+        require(ownerOf(tokenId) == msg.sender, "BondStorage: You are not the owner");
         _transfer(msg.sender, to, tokenId);
     }
 
