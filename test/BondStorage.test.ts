@@ -3,8 +3,7 @@ import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 
 import { MockBondStorage } from "../types/MockBondStorage"
-import { BigNumber, BigNumberish, ContractReceipt, Wallet } from "ethers"
-import { extractTokenId } from "./shared/utils"
+
 use(solidity)
 
 describe("BondStorage", function () {
