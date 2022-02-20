@@ -199,7 +199,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
 
      /* ========== RESTRICTED ========== */
 
-    function mintFor(uint amount, address user, bytes memory _bondType) public payable onlyOwner returns(uint id) {
+    function mintFor(uint amount, address user, bytes memory _bondType) public onlyOwner returns(uint id) {
         id = _mint(amount, user, _bondType);
     }
     

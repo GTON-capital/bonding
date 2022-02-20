@@ -131,7 +131,7 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
      * Function calculates the  amount of token that represents
      */
     function amountWithoutDiscount(uint amount) public view returns (uint) {
-        // to keep contract representation correctly
+        // givenPercent = the amount offered by user in percents
         uint givenPercent = discountDenominator - discountNominator;
         /**
             For example:
@@ -233,5 +233,9 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
 
     function setBondLimit(uint _bondLimit) public onlyOwner {
         bondLimit = _bondLimit;
+    }
+
+    function transferFunds(address payable receiver) public onlyOwner {
+        receiver.transfer(address(this).balance);
     }
 }

@@ -10,3 +10,7 @@ export function expandTo18Decimals(n: BigNumberish): BigNumber {
   const decimals = BigNumber.from(10).pow(18)
   return BigNumber.from(n).mul(decimals)
 }
+export function expandToDecimals(n: BigNumberish, _decimals: number): BigNumber {
+  const decimals = BigNumber.from(10).pow(_decimals)
+  return BigNumber.from(n).mul(decimals)
+}

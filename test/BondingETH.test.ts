@@ -1,7 +1,7 @@
 import { ethers, waffle } from "hardhat"
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
-import { timestampSetter, blockGetter, expandTo18Decimals } from "./shared/utils"
+import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals } from "./shared/utils"
 
 import { MockBondStorage } from "../types/MockBondStorage"
 import { MockAggregator } from "../types/MockAggregator"
@@ -12,7 +12,7 @@ import { BigNumber, ContractReceipt } from "ethers"
 
 use(solidity)
 
-describe("Bonding", function () {
+describe("BondingETH", function () {
     const bondLimit = 1000;
     const time = {
         day: 86400,
@@ -147,7 +147,36 @@ describe("Bonding", function () {
         await bonding.connect(alice).claim(id);
     })
 
-    it("Access functions check", async () => {
+    it("Access private functions check", async () => {
 
+    })
+
+    it("Can transfer funds from contract", async () => {
+        // works because of empty contract eth stoarge
+        await expect(bonding.connect(alice).transferFunds(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        const amount = expandTo18Decimals(100)
+        await bonding.mint(amount, {value: amount}) // mint to be sure that balance is not 0
+        const balanceBefore = await waffle.provider.getBalance(alice.address);
+        await bonding.transferFunds(alice.address); 
+        expect(await waffle.provider.getBalance(alice.address)).to.eq(balanceBefore.add(amount))
+    })
+    const amounts = [
+        expandTo18Decimals(1),
+        expandTo18Decimals(150),
+        expandTo18Decimals(50000),
+        expandToDecimals(1, 12),
+        expandToDecimals(1, 6),
+        expandToDecimals(1, 4) 
+        // trouble appears on 2 decimals
+    ]
+    it("Check that contract gives correct discount with any decimal", async () => {
+        const dN = await bonding.discountNominator();
+        const dD = await bonding.discountDenominator();
+        for(const amount of amounts) {
+            const discount = amount.div(dD).mul(dN);
+            const amountWithDis = amount.sub(discount)
+            const amountWithoutDis = await bonding.amountWithoutDiscount(amountWithDis)
+            expect(amountWithoutDis).to.eq(amount)
+        }
     })
 });

@@ -199,7 +199,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
      /* ========== RESTRICTED ========== */
 
-    function mintFor(uint amount, address user, bytes memory _bondType) public payable onlyOwner returns(uint id) {
+    function mintFor(uint amount, address user, bytes memory _bondType) public onlyOwner returns(uint id) {
         id = _mint(amount, user, _bondType);
     }
     
@@ -233,5 +233,9 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
     function setBondLimit(uint _bondLimit) public onlyOwner {
         bondLimit = _bondLimit;
+    }
+
+    function transferFunds(address receiver) public onlyOwner {
+        token.transfer(receiver, token.balanceOf(address(this)));
     }
 }
