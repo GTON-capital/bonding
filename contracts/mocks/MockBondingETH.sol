@@ -22,7 +22,6 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
         IBondStorage _bondStorage, 
         AggregatorV3Interface _tokenAggregator,
         AggregatorV3Interface _gtonAggregator,
-        ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
         bytes memory _bondType
@@ -34,7 +33,6 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
         bondStorage = _bondStorage;
         tokenAggregator = _tokenAggregator;
         gtonAggregator = _gtonAggregator;
-        token = _token;
         gton = _gton;
         sgton = _sgton;
         bondType = _bondType;
@@ -77,7 +75,6 @@ contract MockBondingETH is IBondingETH, Ownable, ERC721Holder {
         uint releaseAmount;
     }
 
-    ERC20 immutable public token;
     ERC20 immutable  public gton;
     Staking immutable public sgton;
     IBondStorage immutable public bondStorage;
