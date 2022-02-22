@@ -90,7 +90,7 @@ describe("BondingETH", function () {
     it("Cannot issue bond without active period and issue of bond ends after period", async () => {
         expect(await bonding.isBondingActive()).to.eq(true);
         await bonding.mint(sampleAmount, { value: sampleAmount });
-        await setTimestamp((await bonding.bondExpiration()).toNumber())
+        await setTimestamp((await bonding.bondingWindowEndTimestamp()).toNumber())
         await expect(bonding.mint(sampleAmount)).to.be.revertedWith("Bonding: Mint is not available in this period");
         expect(await bonding.isBondingActive()).to.eq(false);
     })

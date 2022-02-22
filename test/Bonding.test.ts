@@ -93,7 +93,7 @@ describe("Bonding", function () {
         expect(await bonding.isBondingActive()).to.eq(true);
         await token.approve(bonding.address, sampleAmount)
         await bonding.mint(sampleAmount);
-        await setTimestamp((await bonding.bondExpiration()).toNumber())
+        await setTimestamp((await bonding.bondingWindowEndTimestamp()).toNumber())
         await expect(bonding.mint(sampleAmount)).to.be.revertedWith("Bonding: Mint is not available in this period");
         expect(await bonding.isBondingActive()).to.eq(false);
     })

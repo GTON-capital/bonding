@@ -105,7 +105,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
     /**
      * View function returns timestamp when bond period vill be over
      */
-    function bondExpiration() public view returns(uint) {
+    function bondingWindowEndTimestamp() public view returns(uint) {
         return lastBondActivation + bondActivePeriod;
     }
 
@@ -123,7 +123,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
         (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
-        uint tokenInUSD = amountIn * uint(tokenPrice)  / tokenDecimals;
+        uint tokenInUSD = amountIn * uint(tokenPrice) / tokenDecimals;
         amountOut = tokenInUSD / uint(gtonPrice) / gtonDecimals;
     }
 
@@ -147,7 +147,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
      * that last block timestamp is between bondEpiration timestamp and lastBondActivation timestamp.
      */
     function isBondingActive() public view returns(bool) {
-        return block.timestamp >= lastBondActivation && block.timestamp <= bondExpiration();
+        return block.timestamp >= lastBondActivation && block.timestamp <= bondingWindowEndTimestamp();
     }
 
     /**
