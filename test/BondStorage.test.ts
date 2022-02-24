@@ -2,7 +2,7 @@ import { ethers, waffle } from "hardhat"
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 
-import { MockBondStorage } from "../types/MockBondStorage"
+import { BondStorage } from "../types/BondStorage"
 
 use(solidity)
 
@@ -14,10 +14,10 @@ describe("BondStorage", function () {
     const [wallet, bob, carol, alice, dev] = waffle.provider.getWallets()
 
     let BondStorage: any
-    let storage: MockBondStorage
+    let storage: BondStorage
 
     before(async () => {
-        BondStorage = await ethers.getContractFactory("MockBondStorage");
+        BondStorage = await ethers.getContractFactory("BondStorage");
     })
 
     beforeEach(async () => {

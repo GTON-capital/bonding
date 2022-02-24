@@ -1,12 +1,13 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { IBondStorage } from "../interfaces/IBondStorage.sol";
+import { IBondStorage } from "./interfaces/IBondStorage.sol";
+
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MockBondStorage is IBondStorage,ERC721Burnable,Ownable {
+contract BondStorage is IBondStorage,ERC721Burnable,Ownable {
 
     constructor(
         string memory _name,

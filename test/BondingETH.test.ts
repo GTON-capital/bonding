@@ -3,9 +3,9 @@ import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
 
-import { MockBondStorage } from "../types/MockBondStorage"
+import { BondStorage } from "../types/BondStorage"
 import { MockAggregator } from "../types/MockAggregator"
-import { MockBondingETH } from "../types/MockBondingETH"
+import { BondingETH } from "../types/BondingETH"
 import { MockERC20 } from "../types/MockERC20"
 import { MockStaking } from "../types/MockStaking"
 import { BigNumber, BigNumberish, Wallet } from "ethers"
@@ -24,7 +24,6 @@ describe("BondingETH", function () {
     const [wallet, bob, carol, alice, dev] = waffle.provider.getWallets()
 
     const setTimestamp = timestampSetter(waffle.provider)
-    const getLastTS = blockGetter(waffle.provider, "timestamp")
 
     let Bonding: any
     let BondStorage: any
@@ -32,17 +31,17 @@ describe("BondingETH", function () {
     let ERC20: any
     let Staking: any
 
-    let storage: MockBondStorage;
+    let storage: BondStorage;
     let gtonAgg: MockAggregator;
     let tokenAgg: MockAggregator;
-    let bonding: MockBondingETH;
+    let bonding: BondingETH;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
 
     before(async () => {
-        Bonding = await ethers.getContractFactory("MockBondingETH", wallet)
-        BondStorage = await ethers.getContractFactory("MockBondStorage")
+        Bonding = await ethers.getContractFactory("BondingETH", wallet)
+        BondStorage = await ethers.getContractFactory("BondStorage")
         Aggregator = await ethers.getContractFactory("MockAggregator")
         ERC20 = await ethers.getContractFactory("MockERC20")
         Staking = await ethers.getContractFactory("MockStaking")
@@ -57,17 +56,16 @@ describe("BondingETH", function () {
             storage.address,
             tokenAgg.address,
             gtonAgg.address,
-            token.address,
             gton.address,
             sgton.address,
-            ethers.utils.formatBytes32String("7d")) as MockBondingETH;
+            ethers.utils.formatBytes32String("7d")) as BondingETH;
     }
 
     beforeEach(async function () {
         gton = await ERC20.deploy("Graviton", "GTON");
         sgton = await Staking.deploy(gton.address, "Staking GTON", "sGTON", 2232, time.day)
         token = await ERC20.deploy("Token", "TKN");
-        storage = await BondStorage.deploy("BondStorage", "BondS") as MockBondStorage;
+        storage = await BondStorage.deploy("BondStorage", "BondS") as BondStorage;
         gtonAgg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
         tokenAgg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
         bonding = await deployDefaultBonding()

@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { IBonding } from "../interfaces/IBonding.sol";
-import { IBondStorage } from "../interfaces/IBondStorage.sol";
+import { IBondingETH } from "./interfaces/IBondingETH.sol";
+import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
@@ -12,7 +12,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract MockBonding is IBonding, Ownable, ERC721Holder {
+contract BondingETH is IBondingETH, Ownable, ERC721Holder {
 
     constructor(
         uint _bondLimit, 
@@ -22,7 +22,6 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         IBondStorage _bondStorage, 
         AggregatorV3Interface _tokenAggregator,
         AggregatorV3Interface _gtonAggregator,
-        ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
         bytes memory _bondType
@@ -34,7 +33,6 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         bondStorage = _bondStorage;
         tokenAggregator = _tokenAggregator;
         gtonAggregator = _gtonAggregator;
-        token = _token;
         gton = _gton;
         sgton = _sgton;
         bondType = _bondType;
@@ -77,7 +75,6 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         uint releaseAmount;
     }
 
-    ERC20 immutable public token;
     ERC20 immutable  public gton;
     Staking immutable public sgton;
     IBondStorage immutable public bondStorage;
@@ -131,7 +128,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
      * Function calculates the  amount of token that represents
      */
     function amountWithoutDiscount(uint amount) public view returns (uint) {
-        // to keep contract representation correctly
+        // givenPercent = the amount offered by user in percents
         uint givenPercent = discountDenominator - discountNominator;
         /**
             For example:
@@ -161,7 +158,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
     function _mint(uint amount, address user, bytes memory _bondType) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
-        token.transferFrom(msg.sender, address(this), amount);
+        require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
         uint reward = getStakingReward(sgtonAmount);
@@ -173,13 +170,13 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
         bondCounter++;
         emit Mint(id, user);
-        emit MintData(address(token), bondReward, releaseTimestamp, _bondType);
+        emit MintData(address(0), bondReward, releaseTimestamp, _bondType);
     }
 
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public mintEnabled returns(uint id) {
+    function mint(uint amount) public payable mintEnabled returns(uint id) {
         id = _mint(amount, msg.sender, bondType);
     }
 
@@ -199,7 +196,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
 
      /* ========== RESTRICTED ========== */
 
-    function mintFor(uint amount, address user, bytes memory _bondType) public onlyOwner returns(uint id) {
+    function mintFor(uint amount, address user, bytes memory _bondType) public payable onlyOwner returns(uint id) {
         id = _mint(amount, user, _bondType);
     }
     
@@ -235,7 +232,7 @@ contract MockBonding is IBonding, Ownable, ERC721Holder {
         bondLimit = _bondLimit;
     }
 
-    function transferFunds(address receiver) public onlyOwner {
-        token.transfer(receiver, token.balanceOf(address(this)));
+    function transferFunds(address payable receiver) public onlyOwner {
+        receiver.transfer(address(this).balance);
     }
 }
