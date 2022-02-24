@@ -70,7 +70,7 @@ describe("BondingETH", function () {
         tokenAgg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
         bonding = await deployDefaultBonding()
         await bonding.startBonding();
-        await storage.transferOwnership(bonding.address)
+        await storage.setAdmin(bonding.address)
         await gton.mint(bonding.address, expandTo18Decimals(500000))
     })
 
