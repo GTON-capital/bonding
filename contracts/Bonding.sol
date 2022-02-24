@@ -235,7 +235,7 @@ contract Bonding is IBonding, Ownable, ERC721Holder {
         bondLimit = _bondLimit;
     }
 
-    function transferFunds(address receiver) public onlyOwner {
-        token.transfer(receiver, token.balanceOf(address(this)));
+    function transferToken(ERC20 _token, address user) public onlyOwner {
+        _token.transfer(user, _token.balanceOf(account));
     }
 }
