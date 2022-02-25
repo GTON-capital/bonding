@@ -56,6 +56,7 @@ describe("BondingETH", function () {
             storage.address,
             tokenAgg.address,
             gtonAgg.address,
+            token.address,
             gton.address,
             sgton.address,
             ethers.utils.formatBytes32String("7d")) as BondingETH;
@@ -100,16 +101,6 @@ describe("BondingETH", function () {
     it("Cannot activate active bonding and check access", async () => {
         await expect(bonding.connect(alice).startBonding()).to.be.revertedWith("Ownable: caller is not the owner");
         await expect(bonding.startBonding()).to.be.revertedWith("Bonding: Bonding is already active");
-    })
-
-    it("Owner can mint for anyone", async () => {
-        const amount = expandTo18Decimals(150);
-        const type = ethers.utils.formatBytes32String("VC")
-        await expect(bonding.connect(alice).mintFor(amount, alice.address, type)).to.be.revertedWith("Ownable: caller is not the owner");
-        const tx = await bonding.mintFor(amount, alice.address, type, { value: amount });
-        const id = extractTokenId(await tx.wait())
-        expect(alice.address).to.eq(await storage.ownerOf(id));
-        expect(await bonding.isActiveBond(id)).to.eq(true);
     })
 
     it("Can mint and claim after the bond period", async () => {
@@ -174,11 +165,11 @@ describe("BondingETH", function () {
 
     it("Can transfer funds from contract", async () => {
         // works because of empty contract eth stoarge
-        await expect(bonding.connect(alice).transferFunds(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(bonding.connect(alice).transferNative(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
         const amount = expandTo18Decimals(100)
         await bonding.mint(amount, { value: amount }) // mint to be sure that balance is not 0
         const balanceBefore = await waffle.provider.getBalance(alice.address);
-        await bonding.transferFunds(alice.address);
+        await bonding.transferNative(alice.address);
         expect(await waffle.provider.getBalance(alice.address)).to.eq(balanceBefore.add(amount))
     })
     async function mintForClaim(user: Wallet, amount: BigNumberish): Promise<BigNumber> {

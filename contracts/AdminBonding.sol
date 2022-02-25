@@ -12,7 +12,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract Bonding is ABonding {
+contract AdminBonding is ABonding {
 
     constructor(
         uint _bondLimit, 
@@ -42,13 +42,8 @@ contract Bonding is ABonding {
 
      /* ========== RESTRICTED ========== */
 
-    /**
-     * Function issues bond to user by minting the NFT token for them.
-     */
-    function mint(uint amount) public mintEnabled returns(uint id) {
-        token.transferFrom(msg.sender, address(this), amount);
-        uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
-        id = _mint(amount, msg.sender, releaseTimestamp, bondType);
+    function mint(uint amount, address user, uint period, bytes memory _bondType) public onlyOwner returns(uint id) {
+        id = _mint(amount, user, period, _bondType);
     }
     
     function transferToken(ERC20 _token, address user) public onlyOwner {

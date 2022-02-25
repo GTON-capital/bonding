@@ -107,16 +107,6 @@ describe("Bonding", function () {
         await expect(bonding.startBonding()).to.be.revertedWith("Bonding: Bonding is already active");
     })
 
-    it("Owner can mint for anyone", async () => {
-        const amount = expandTo18Decimals(150);
-        const type = ethers.utils.formatBytes32String("VC")
-        await expect(bonding.connect(alice).mintFor(amount, alice.address, type)).to.be.revertedWith("Ownable: caller is not the owner");
-        await token.approve(bonding.address, amount)
-        const tx = await bonding.mintFor(amount, alice.address, type);
-        const id = extractTokenId(await tx.wait())
-        expect(alice.address).to.eq(await storage.ownerOf(id));
-        expect(await bonding.isActiveBond(id)).to.eq(true);
-    })
 
     it("Can mint and claim after the bond period", async () => {
         const amount = expandTo18Decimals(100)
