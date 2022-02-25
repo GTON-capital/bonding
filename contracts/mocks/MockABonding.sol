@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { ABonding } from "./ABonding.sol";
-import { IBondStorage } from "./interfaces/IBondStorage.sol";
+import { ABonding } from "../ABonding.sol";
+import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
@@ -12,7 +12,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract Bonding is ABonding {
+contract MockABonding is ABonding {
 
     constructor(
         uint _bondLimit, 
@@ -40,14 +40,12 @@ contract Bonding is ABonding {
             _bondType
         ){}
 
-     /* ========== RESTRICTED ========== */
-
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public mintEnabled returns(uint id) {
-        token.transferFrom(msg.sender, address(this), amount);
+    function mint(uint amount) public returns(uint id) {
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp, bondType);
     }
+
 }

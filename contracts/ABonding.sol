@@ -222,5 +222,8 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     function setBondLimit(uint _bondLimit) public onlyOwner {
         bondLimit = _bondLimit;
     }
-
+    
+    function transferToken(ERC20 _token, address user) public onlyOwner {
+        _token.transfer(user, _token.balanceOf(address(this)));
+    }
 }

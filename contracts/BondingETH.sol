@@ -54,8 +54,4 @@ contract BondingETH is ABonding {
     function transferNative(address payable to) public onlyOwner {
         to.transfer(address(this).balance);
     }
-    
-    function transferToken(ERC20 _token, address user) public onlyOwner {
-        _token.transfer(user, _token.balanceOf(address(this)));
-    }
 }

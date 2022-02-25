@@ -45,8 +45,4 @@ contract AdminBonding is ABonding {
     function mint(uint amount, address user, uint period, bytes memory _bondType) public onlyOwner returns(uint id) {
         id = _mint(amount, user, period, _bondType);
     }
-    
-    function transferToken(ERC20 _token, address user) public onlyOwner {
-        _token.transfer(user, _token.balanceOf(address(this)));
-    }
 }
