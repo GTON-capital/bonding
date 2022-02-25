@@ -32,8 +32,22 @@ describe("BondStorage", function () {
         expect(await storage.tokenCounter()).to.eq(0)
     })
 
+    it("Check mints of user", async () => {
+        // mint 2 tokens to alice
+        await storage.mint(alice.address); // 0 id
+        await storage.mint(alice.address); // 1 id
+        expect(await storage.userIdsLength(alice.address)).to.eq(2);
+        expect(await storage.userIds(alice.address, 0)).to.eq(0);
+        expect(await storage.userIds(alice.address, 1)).to.eq(1);
+    })
+
+    it("Check issuedBy", async () => {
+        await storage.mint(alice.address); // 0 id
+        expect(await storage.issuedBy(0)).to.eq(wallet.address);
+    })
+
     it("Mint accessible to owner only", async() => {
-        await expect(storage.connect(alice).mint(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(storage.connect(alice).mint(alice.address)).to.be.revertedWith("AdminAccess: restricted to admin or owner only");
         await storage.mint(alice.address);
         const id = await getLastTokenId()
         expect(await storage.ownerOf(id)).to.eq(alice.address)

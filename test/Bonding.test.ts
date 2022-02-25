@@ -182,12 +182,12 @@ describe("Bonding", function () {
 
     it("Can transfer funds from contract", async () => {
         // works because of empty contract eth stoarge
-        await expect(bonding.connect(alice).transferFunds(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(bonding.connect(alice).transferToken(token.address, alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
         const amount = expandTo18Decimals(100)
         await token.approve(bonding.address, amount)
         await bonding.mint(amount) // mint to be sure that balance is not 0
         const balanceBefore = await token.balanceOf(alice.address);
-        await bonding.transferFunds(alice.address);
+        await bonding.transferToken(token.address, alice.address);
         expect(await token.balanceOf(alice.address)).to.eq(balanceBefore.add(amount))
     })
 

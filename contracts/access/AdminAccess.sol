@@ -8,7 +8,7 @@ abstract contract AdminAccess is Ownable {
     mapping(address => bool) admins;
 
     modifier onlyAdminOrOwner() {
-        require(isAdmin(msg.sender) || owner() == msg.sender);
+        require(isAdmin(msg.sender) || owner() == msg.sender, "AdminAccess: restricted to admin or owner only");
         _;
     }
 
