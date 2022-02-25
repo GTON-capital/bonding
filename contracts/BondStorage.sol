@@ -6,7 +6,7 @@ import { AdminAccess } from "./access/AdminAccess.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract BondStorage is IBondStorage,ERC721Burnable,AdminAccess {
+contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
 
     constructor(
         string memory _name,

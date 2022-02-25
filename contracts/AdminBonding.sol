@@ -41,7 +41,7 @@ contract AdminBonding is ABonding {
         ){}
 
      /* ========== RESTRICTED ========== */
-
+    
     function mint(uint amount, address user, uint period, bytes memory _bondType) public onlyOwner returns(uint id) {
         id = _mint(amount, user, period, _bondType);
     }
