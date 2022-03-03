@@ -124,7 +124,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
         uint tokenInUSD = amountIn * uint(tokenPrice) / tokenDecimals;
-        amountOut = tokenInUSD / uint(gtonPrice) / gtonDecimals;
+        amountOut = amountIn * uint(tokenPrice) * gtonDecimals / tokenDecimals / uint(gtonPrice);
     }
 
     /**
