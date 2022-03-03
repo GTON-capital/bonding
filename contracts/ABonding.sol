@@ -25,7 +25,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
-        bytes memory _bondType
+        string memory bondType
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
@@ -37,7 +37,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         token = _token;
         gton = _gton;
         sgton = _sgton;
-        bondType = _bondType;
+        _bondType = bytes(bondType);
     }
 
     /* ========== MODIFIERS  ========== */
@@ -58,7 +58,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     /* ========== STATE VARIABLES ========== */
 
-    bytes public bondType;
+    bytes _bondType;
     uint public lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
     uint public bondActivePeriod;
@@ -73,7 +73,6 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         bool isActive;
         uint issueTimestamp;
         uint releaseTimestamp;
-        bytes bondType;
         uint releaseAmount;
     }
 
@@ -88,6 +87,10 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     function isActiveBond(uint id) public view returns(bool) {
         return activeBonds[id].isActive;
+    }
+
+    function bondType() public view returns(string memory) {
+        return string(_bondType);
     }
 
     /**
@@ -159,7 +162,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function _mint(uint amount, address user, uint releaseTimestamp, bytes memory _bondType) internal returns(uint id) {
+    function _mint(uint amount, address user, uint releaseTimestamp) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
@@ -167,11 +170,11 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         uint bondReward = sgtonAmount + reward;
         id = bondStorage.mint(user);
 
-        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
+        activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, bondReward);
 
         bondCounter++;
         emit Mint(id, user);
-        emit MintData(address(token), bondReward, releaseTimestamp, _bondType);
+        emit MintData(address(token), bondReward, releaseTimestamp, bondType());
     }
 
     /**

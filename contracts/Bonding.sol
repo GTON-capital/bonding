@@ -25,7 +25,7 @@ contract Bonding is ABonding {
         ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
-        bytes memory _bondType
+        string memory _bondType
         ) ABonding(
             _bondLimit, 
             _bondActivePeriod, 
@@ -48,6 +48,6 @@ contract Bonding is ABonding {
     function mint(uint amount) public mintEnabled returns(uint id) {
         token.transferFrom(msg.sender, address(this), amount);
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
-        id = _mint(amount, msg.sender, releaseTimestamp, bondType);
+        id = _mint(amount, msg.sender, releaseTimestamp);
     }
 }

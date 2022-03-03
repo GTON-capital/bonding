@@ -25,7 +25,7 @@ contract BondingETH is ABonding {
         ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
-        bytes memory _bondType
+        string memory _bondType
         ) ABonding(
             _bondLimit, 
             _bondActivePeriod, 
@@ -48,7 +48,7 @@ contract BondingETH is ABonding {
     function mint(uint amount) public payable mintEnabled returns(uint id) {
         require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
-        id = _mint(amount, msg.sender, releaseTimestamp, bondType);
+        id = _mint(amount, msg.sender, releaseTimestamp);
     }
 
     function transferNative(address payable to) public onlyOwner {

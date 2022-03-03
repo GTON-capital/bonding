@@ -25,7 +25,7 @@ contract MockABonding is ABonding {
         ERC20 _token,
         ERC20 _gton,
         Staking _sgton,
-        bytes memory _bondType
+        string memory _bondType
         ) ABonding(
             _bondLimit, 
             _bondActivePeriod, 
@@ -45,7 +45,7 @@ contract MockABonding is ABonding {
      */
     function mint(uint amount) public returns(uint id) {
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
-        id = _mint(amount, msg.sender, releaseTimestamp, bondType);
+        id = _mint(amount, msg.sender, releaseTimestamp);
     }
 
 }

@@ -24,7 +24,7 @@ interface IBasicBonding is IERC721Receiver {
      * `releaseDate` - timestamp, when the bond will be available to claim
      * `bondType` - string representation of bondType
      */
-    event MintData(address indexed asset, uint allocation, uint releaseDate, bytes bondType);
+    event MintData(address indexed asset, uint allocation, uint releaseDate, string bondType);
 
     /**
      * @dev Emitted when `user` claims `tokenId` bond.

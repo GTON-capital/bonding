@@ -211,8 +211,7 @@ describe("Bonding", function () {
                 for (const { tokenPrice, tokenDecimals, gtonPrice, gtonDecimals } of prices) {
                     await updatePrice(tokenAgg, tokenPrice, tokenDecimals);
                     await updatePrice(gtonAgg, gtonPrice, gtonDecimals);
-                    const tokenAmount = amount.mul(tokenPrice).div(tokenDecimals);
-                    const amountOut = tokenAmount.div(gtonPrice).div(gtonDecimals)
+                    const amountOut = amount.mul(tokenPrice).mul(gtonDecimals).div(tokenDecimals).div(gtonPrice)
                     expect(await bonding.bondAmountOut(amount)).to.eq(amountOut);
                 }
             }
