@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-interface IBondingMinter {
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+
+interface IBasicBonding is IERC721Receiver {
 
     /**
      * @dev Emitted when the bond period opens. 
@@ -12,7 +14,7 @@ interface IBondingMinter {
     /**
      * @dev Emitted when the bond is minted for `user` with `tokenId` id. 
      */
-    event Mint(address indexed tokenId, address indexed user);
+    event Mint(uint indexed tokenId, address indexed user);
 
     /**
      * @dev Emitted when the bond is minted. 
@@ -23,6 +25,18 @@ interface IBondingMinter {
      * `bondType` - string representation of bondType
      */
     event MintData(address indexed asset, uint allocation, uint releaseDate, string bondType);
+
+    /**
+     * @dev Emitted when `user` claims `tokenId` bond.
+     */
+    event Claim(address indexed user, uint tokenId);
+
+    /**
+     * @dev Function calculates amount of token out
+     * Params:
+     * - amountIn - token amount to be spended by user
+     */
+    function bondAmountOut(uint amountIn) external view returns(uint amountOut);
 
     /**
      * @dev Starts bonding period.
@@ -36,10 +50,11 @@ interface IBondingMinter {
      */
     function totalSupply() external view returns (uint);
 
+
     /**
-     * @dev Mints new token for message sender.
-     * 
-     * Emits {Mint} and {MintData} events
+     * @dev Releases sGTON token for user by it's `tokenId`.
+
+     * Emits {Claim} event.
      */
-    function mint() external payable returns (uint tokenId);
+    function claim(uint tokenId) external;
 }

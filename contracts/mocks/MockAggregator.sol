@@ -56,8 +56,8 @@ contract MockAggregator is AggregatorV3Interface {
     }
 
     function updatePriceAndDecimals(
-        uint8 dec,
-        int256 price
+        int256 price,
+        uint8 dec
     ) public {
         _decimals = dec;
         _price = price;

@@ -40,24 +40,18 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 20000,
   },
-  namedAccounts: {
-    deployer: {
-      default: 0,
-    },
-    dev: {
-      // Default to 1
-      default: 2,
-      // dev address mainnet
-      // 1: "",
-    },
-  },
   networks: {
   /*  mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts,
       gasPrice: 120 * 1000000000,
       chainId: 1,
-    }, */
+    }, 
+    "fantom-testnet": {
+      chainId: 4002,
+      url: "https://rpc.testnet.fantom.network",
+      accounts: [process.env.DEPLOYER],
+    },*/
     localhost: {
       live: false,
       saveDeployments: true,
@@ -314,7 +308,10 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.8"
-      }
+      },
+      {
+        version: "0.5.17"
+      },
     ],
   },
   tenderly: {
