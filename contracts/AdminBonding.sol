@@ -72,7 +72,7 @@ contract AdminBonding is Ownable, ERC721Holder {
      /* ========== RESTRICTED ========== */
     
     function mint(uint bondReward, address user, uint releaseTimestamp, bytes memory _bondType) public onlyOwner returns(uint id) {
-        id = bondStorage.mint(user);
+        id = bondStorage.mint(user, releaseTimestamp, bondReward);
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
 
         bondCounter++;

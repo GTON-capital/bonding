@@ -13,5 +13,4 @@ interface IBondingETH is IBasicBonding {
      * Emits {Mint} and {MintData} events
      */
     function mint(uint amount) external payable returns (uint tokenId);
-
 }
