@@ -10,5 +10,5 @@ interface IBondStorage is IERC721 {
      * 
      * Accessible by owner only!
      */
-    function mint(address to) external returns(uint);
+    function mint(address to, uint releaseTimestamp, uint reward) external returns(uint);
 }
