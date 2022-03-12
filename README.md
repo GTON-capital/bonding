@@ -26,3 +26,15 @@ npm is required
 npm i
 npx hardhat test
 ```
+## Deployment 
+Fill in the field **PRIVATEKEY** in the file _example.env_ and rename it to _.env_.  
+Set all necessary addresses for deployment in the file **scripts/Bonding.ts**, all can be left intact except **bondStorageAddress** since you need to add the address of the contract you are about to deploy calling _setAdmin_ method of BondStorage, if you don't have admin access - you need to deploy an instance of it as well.  
+Run this command to make deployment to FTM Testnet with your account:
+```
+npx hardhat run scripts/Bonding.ts --network ftmTestnet
+```
+Due to the bug in FTMScan there is no automatic verification with _hardhat-etherscan_. In order to verify the account - create a flattened version of the file using:
+```
+npx hardhat flatten contracts/BondingETH.sol > BondingFlattened.sol
+```
+Unfortunately you'll have to manually delete duplicated SPDX identifiers, then go to FTMScan and upload the file selecting compiler version v0.8.8, single-file verification. Upon doing that you can interact with the contract. Remember to add this contract's address to BondStorage, and call startBonding -- you are good to go and can start creating bonds!
