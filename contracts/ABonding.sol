@@ -123,7 +123,6 @@ abstract contract ABonding is IBasicBonding, AdminAccess, ERC721Holder {
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
         (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
-        uint tokenInUSD = amountIn * uint(tokenPrice) / tokenDecimals;
         amountOut = amountIn * uint(tokenPrice) * gtonDecimals / tokenDecimals / uint(gtonPrice);
     }
 
@@ -166,7 +165,7 @@ abstract contract ABonding is IBasicBonding, AdminAccess, ERC721Holder {
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
         uint reward = getStakingReward(sgtonAmount);
         uint bondReward = sgtonAmount + reward;
-        id = bondStorage.mint(user);
+        id = bondStorage.mint(user, releaseTimestamp, bondReward);
 
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, bondReward);
 
@@ -231,4 +230,6 @@ abstract contract ABonding is IBasicBonding, AdminAccess, ERC721Holder {
     function updateWlAllocation(address user, uint amount) public onlyAdminOrOwner {
         wlAllocation[user] = amount;
     }
+
 }
+
