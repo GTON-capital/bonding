@@ -45,7 +45,7 @@ contract BondingETH is ABonding {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public payable mintEnabled returns(uint id) {
+    function mint(uint amount) public payable checkAllocation(amount) returns(uint id) {
         require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);

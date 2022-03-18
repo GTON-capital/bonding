@@ -45,7 +45,7 @@ contract Bonding is ABonding {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public mintEnabled returns(uint id) {
+    function mint(uint amount) public checkAllocation(amount) returns(uint id) {
         token.transferFrom(msg.sender, address(this), amount);
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);

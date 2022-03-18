@@ -3,16 +3,16 @@ pragma solidity >=0.8.0;
 
 import { IBasicBonding } from "./interfaces/IBasicBonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
+import { AdminAccess } from "./access/AdminAccess.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
+abstract contract ABonding is IBasicBonding, AdminAccess, ERC721Holder {
 
     constructor(
         uint _bondLimit, 
@@ -42,13 +42,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     /* ========== MODIFIERS  ========== */
 
-    /**
-     * Mofidier checks if bonding period is open and provides access to the function
-     * It is used for mint function.
-     */
-    modifier mintEnabled() {
-        require(isBondingActive(), 
-            "Bonding: Mint is not available in this period");
+    modifier checkAllocation(uint amount) {
+        uint given = wlAllocation[msg.sender];
+        require(given >= amount, "Bonding: you don't have enough allocation");
         _;
     }
 
@@ -68,6 +64,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     uint public bondCounter;
     uint public discountNominator;
     mapping (uint => BondData) public activeBonds;
+    mapping (address => uint) public wlAllocation;
 
     struct BondData {
         bool isActive;
@@ -164,6 +161,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     function _mint(uint amount, address user, uint releaseTimestamp) internal returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
+        wlAllocation[msg.sender] -= amount;
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
         uint reward = getStakingReward(sgtonAmount);
@@ -228,5 +226,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     
     function transferToken(ERC20 _token, address user) public onlyOwner {
         _token.transfer(user, _token.balanceOf(address(this)));
+    }
+
+    function updateWlAllocation(address user, uint amount) public onlyAdminOrOwner {
+        wlAllocation[user] = amount;
     }
 }
