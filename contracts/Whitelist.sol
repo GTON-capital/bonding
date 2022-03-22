@@ -2,9 +2,9 @@
 pragma solidity >=0.8.0;
 
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { AdminAccess } from "./access/AdminAccess.sol";
 
-contract Whitelist is IWhitelist, Ownable {
+contract Whitelist is IWhitelist, AdminAccess {
 
     mapping(address => uint) whitelist;
 
@@ -16,7 +16,7 @@ contract Whitelist is IWhitelist, Ownable {
         return whitelist[user];
     }
 
-    function updateAllocation(address user, uint allocation) public onlyOwner {
+    function updateAllocation(address user, uint allocation) public onlyAdminOrOwner {
         whitelist[user] = allocation;
     }
 }

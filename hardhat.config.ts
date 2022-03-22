@@ -12,14 +12,11 @@ import "hardhat-typechain"
 import "hardhat-watcher"
 import "solidity-coverage"
 
-import { resolve } from "path";
-import { config as dotenvConfig } from "dotenv";
-dotenvConfig({ path: resolve(__dirname, "./.env") });
-
 import { HardhatUserConfig } from "hardhat/types"
 
-let accounts = {
-  accounts: [process.env.PRIVATEKEY]
+const accounts = {
+  mnemonic: process.env.MNEMONIC,
+  // accountsBalance: "990000000000000000000",
 }
 
 const config: HardhatUserConfig = {
@@ -31,6 +28,9 @@ const config: HardhatUserConfig = {
     // except: []
   },
   defaultNetwork: "hardhat",
+  etherscan: {
+    apiKey: process.env.SCAN_API_KEY,
+  },
   gasReporter: {
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     currency: "USD",
@@ -41,12 +41,17 @@ const config: HardhatUserConfig = {
     timeout: 20000,
   },
   networks: {
-    mainnet: {
+  /*  mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts,
       gasPrice: 120 * 1000000000,
       chainId: 1,
-      ...accounts
     }, 
+    "fantom-testnet": {
+      chainId: 4002,
+      url: "https://rpc.testnet.fantom.network",
+      accounts: [process.env.DEPLOYER],
+    },*/
     localhost: {
       live: false,
       saveDeployments: true,
@@ -60,99 +65,223 @@ const config: HardhatUserConfig = {
       live: false,
       saveDeployments: true,
       tags: ["test", "local"],
-      },
-    ftmTestnet: {
-      chainId: 4002,
-      url: "https://rpc.testnet.fantom.network",
-      ...accounts
     },
+   /*
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts,
       chainId: 3,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasPrice: 5000000000,
       gasMultiplier: 2,
-      ...accounts
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts,
       chainId: 4,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasPrice: 5000000000,
       gasMultiplier: 2,
-      ...accounts
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts,
       chainId: 5,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasPrice: 5000000000,
       gasMultiplier: 2,
-      ...accounts
     },
     kovan: {
       url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      accounts,
       chainId: 42,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasPrice: 20000000000,
       gasMultiplier: 2,
-      ...accounts
     },
-    polygon: {
+    moonbase: {
+      url: "https://rpc.testnet.moonbeam.network",
+      accounts,
+      chainId: 1287,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gas: 5198000,
+      gasMultiplier: 2,
+    },
+    matic: {
       url: "https://rpc-mainnet.maticvigil.com",
+      accounts,
       chainId: 137,
       live: true,
       saveDeployments: true,
-      ...accounts
     },
-    polygonMumbai: {
+    mumbai: {
       url: "https://rpc-mumbai.maticvigil.com/",
+      accounts,
       chainId: 80001,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasMultiplier: 2,
-      ...accounts
+    },
+    xdai: {
+      url: "https://rpc.xdaichain.com",
+      accounts,
+      chainId: 100,
+      live: true,
+      saveDeployments: true,
     },
     bsc: {
       url: "https://bsc-dataseed.binance.org",
+      accounts,
       chainId: 56,
       live: true,
       saveDeployments: true,
-      ...accounts
     },
     "bsc-testnet": {
       url: "https://data-seed-prebsc-2-s3.binance.org:8545",
+      accounts,
       chainId: 97,
       live: true,
       saveDeployments: true,
       tags: ["staging"],
       gasMultiplier: 2,
-      ...accounts
     },
-  },
-  etherscan: {
-    apiKey: {
-        mainnet: process.env.ETHERSCAN,
-        ropsten: process.env.ETHERSCAN,
-        rinkeby: process.env.ETHERSCAN,
-        goerli: process.env.ETHERSCAN,
-        kovan: process.env.ETHERSCAN,
-        // ftm
-        opera: process.env.FTMSCAN,
-        ftmTestnet: process.env.FTMSCAN,
-        // polygon
-        polygon: process.env.POLYGONSCAN,
-        polygonMumbai: process.env.POLYGONSCAN,
-    }
+    heco: {
+      url: "https://http-mainnet.hecochain.com",
+      accounts,
+      chainId: 128,
+      live: true,
+      saveDeployments: true,
+    },
+    "heco-testnet": {
+      url: "https://http-testnet.hecochain.com",
+      accounts,
+      chainId: 256,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    avalanche: {
+      url: "https://api.avax.network/ext/bc/C/rpc",
+      accounts,
+      chainId: 43114,
+      live: true,
+      saveDeployments: true,
+      gasPrice: 470000000000,
+    },
+    fuji: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      accounts,
+      chainId: 43113,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    harmony: {
+      url: "https://api.s0.t.hmny.io",
+      accounts,
+      chainId: 1666600000,
+      live: true,
+      saveDeployments: true,
+    },
+    "harmony-testnet": {
+      url: "https://api.s0.b.hmny.io",
+      accounts,
+      chainId: 1666700000,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    okex: {
+      url: "https://exchainrpc.okex.org",
+      accounts,
+      chainId: 66,
+      live: true,
+      saveDeployments: true,
+    },
+    "okex-testnet": {
+      url: "https://exchaintestrpc.okex.org",
+      accounts,
+      chainId: 65,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    arbitrum: {
+      url: "https://arb1.arbitrum.io/rpc",
+      accounts,
+      chainId: 42161,
+      live: true,
+      saveDeployments: true,
+      blockGasLimit: 700000,
+    },
+    "arbitrum-testnet": {
+      url: "https://kovan3.arbitrum.io/rpc",
+      accounts,
+      chainId: 79377087078960,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    celo: {
+      url: "https://forno.celo.org",
+      accounts,
+      chainId: 42220,
+      live: true,
+      saveDeployments: true,
+    },
+    palm: {
+      url: "https://palm-mainnet.infura.io/v3/da5fbfafcca14b109e2665290681e267",
+      accounts,
+      chainId: 11297108109,
+      live: true,
+      saveDeployments: true,
+    },
+    "palm-testnet": {
+      url: "https://palm-testnet.infura.io/v3/da5fbfafcca14b109e2665290681e267",
+      accounts,
+      chainId: 11297108099,
+      live: true,
+      saveDeployments: true,
+      tags: ["staging"],
+      gasMultiplier: 2,
+    },
+    moonriver: {
+      url: "https://rpc.moonriver.moonbeam.network",
+      accounts,
+      chainId: 1285,
+      live: true,
+      saveDeployments: true,
+    },
+    fuse: {
+      url: "https://rpc.fuse.io",
+      accounts,
+      chainId: 122,
+      live: true,
+      saveDeployments: true,
+    },
+    clover: {
+      url: "https://rpc-ivy.clover.finance",
+      accounts,
+      chainId: 1024,
+      live: true,
+      saveDeployments: true,
+    }, */
   },
   paths: {
     artifacts: "artifacts",
@@ -201,5 +330,7 @@ const config: HardhatUserConfig = {
     },
   },
 }
+
+
 
 export default config

@@ -4,7 +4,6 @@ pragma solidity >=0.8.0;
 import { IBasicBonding } from "./interfaces/IBasicBonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
-import { Whitelisted } from "./Whitelisted.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
@@ -14,7 +13,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted {
+abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     constructor(
         uint _bondLimit, 
@@ -48,8 +47,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted 
      * Mofidier checks if bonding period is open and provides access to the function
      * It is used for mint function.
      */
+
     modifier mintEnabled() {
-        require(isBondingActive(), 
+        require(isWhitelistActive || isBondingActive(), 
             "Bonding: Mint is not available in this period");
         _;
     }
@@ -69,7 +69,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted 
     uint public bondLimit;
     uint public bondCounter;
     uint public discountNominator;
+    bool public isWhitelistActive;
     mapping (uint => BondData) public activeBonds;
+    IWhitelist public whitelist;
 
     struct BondData {
         bool isActive;
@@ -128,7 +130,6 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted 
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
         (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
-        uint tokenInUSD = amountIn * uint(tokenPrice) / tokenDecimals;
         amountOut = amountIn * uint(tokenPrice) * gtonDecimals / tokenDecimals / uint(gtonPrice);
     }
 
@@ -168,9 +169,12 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted 
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
+        uint allowedAllocation = whitelist.allowedAllocation(user);
+        require(sgtonAmount <= allowedAllocation, "Bonding: You are not allowed for this allocation");
+        whitelist.updateAllocation(user, allowedAllocation - sgtonAmount);
         uint reward = getStakingReward(sgtonAmount);
         uint bondReward = sgtonAmount + reward;
-        id = bondStorage.mint(user);
+        id = bondStorage.mint(user, releaseTimestamp, bondReward);
 
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, bondReward);
 
@@ -230,6 +234,10 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted 
 
     function setWhitelist(IWhitelist _whitelist) public onlyOwner {
         whitelist = _whitelist;
+    }
+
+    function toggleWhitelist() public onlyOwner {
+        isWhitelistActive = !isWhitelistActive;
     }
     
     function transferToken(ERC20 _token, address user) public onlyOwner {
