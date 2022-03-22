@@ -169,9 +169,11 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
-        uint allowedAllocation = whitelist.allowedAllocation(user);
-        require(sgtonAmount <= allowedAllocation, "Bonding: You are not allowed for this allocation");
-        whitelist.updateAllocation(user, allowedAllocation - sgtonAmount);
+        if(isWhitelistActive) {
+            uint allowedAllocation = whitelist.allowedAllocation(user);
+            require(sgtonAmount <= allowedAllocation, "Bonding: You are not allowed for this allocation");
+            whitelist.updateAllocation(user, allowedAllocation - sgtonAmount);
+        }
         uint reward = getStakingReward(sgtonAmount);
         uint bondReward = sgtonAmount + reward;
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
