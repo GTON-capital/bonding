@@ -12,5 +12,4 @@ interface IBonding is IBasicBonding {
      * Emits {Mint} and {MintData} events
      */
     function mint(uint amount) external returns (uint tokenId);
-
 }

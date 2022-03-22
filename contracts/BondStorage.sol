@@ -17,17 +17,22 @@ contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
     uint public tokenCounter = 0;
     mapping(address => uint[]) public userIds;
     mapping(uint => address) public issuedBy;
+    mapping(uint => string) public releaseDates;
+    mapping(uint => uint) public rewards;
+    string public bondTokenSymbol;
 
     function userIdsLength(address user) public view returns(uint) {
         return userIds[user].length;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
-    function mint(address to) public override onlyAdminOrOwner returns(uint tokenId) {
+    function mint(address to, uint releaseTimestamp, uint reward) public override onlyAdminOrOwner returns(uint tokenId) {
         tokenId = tokenCounter;
         _safeMint(to, tokenCounter);
         userIds[to].push(tokenId);
         issuedBy[tokenId] = msg.sender;
+        releaseDates[tokenId] = "Test date string";
+        rewards[tokenId] = reward;
         // it always increases and we will never mint the same id
         tokenCounter++;
     }
