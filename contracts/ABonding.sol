@@ -3,6 +3,8 @@ pragma solidity >=0.8.0;
 
 import { IBasicBonding } from "./interfaces/IBasicBonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
+import { IWhitelist } from "./interfaces/IWhitelist.sol";
+import { Whitelisted } from "./Whitelisted.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
@@ -12,7 +14,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
+abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, Whitelisted {
 
     constructor(
         uint _bondLimit, 
@@ -224,6 +226,10 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     function setBondLimit(uint _bondLimit) public onlyOwner {
         bondLimit = _bondLimit;
+    }
+
+    function setWhitelist(IWhitelist _whitelist) public onlyOwner {
+        whitelist = _whitelist;
     }
     
     function transferToken(ERC20 _token, address user) public onlyOwner {
