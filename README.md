@@ -31,7 +31,7 @@ Fill in the field **PRIVATEKEY** in the file _example.env_ and rename it to _.en
 Set all necessary addresses for deployment in the file **scripts/Bonding.ts**, all can be left intact except **bondStorageAddress** since you need to add the address of the contract you are about to deploy calling _setAdmin_ method of BondStorage, if you don't have admin access - you need to deploy an instance of it as well.  
 Run this command to make deployment to FTM Testnet with your account:
 ```
-npx hardhat run scripts/Bonding.ts --network ftmTestnet
+npx hardhat run scripts/Bonding.ts --network fantom-testnet
 ```
 Due to the bug in FTMScan there is no automatic verification with _hardhat-etherscan_. In order to verify the account - create a flattened version of the file using:
 ```

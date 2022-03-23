@@ -41,12 +41,6 @@ const config: HardhatUserConfig = {
     timeout: 20000,
   },
   networks: {
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      gasPrice: 120 * 1000000000,
-      chainId: 1,
-      ...accounts
-    }, 
     localhost: {
       live: false,
       saveDeployments: true,
@@ -60,30 +54,10 @@ const config: HardhatUserConfig = {
       live: false,
       saveDeployments: true,
       tags: ["test", "local"],
-      },
-    ftmTestnet: {
+    },
+    "fantom-testnet": {
       chainId: 4002,
       url: "https://rpc.testnet.fantom.network",
-      ...accounts
-    },
-    ropsten: {
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 3,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasPrice: 5000000000,
-      gasMultiplier: 2,
-      ...accounts
-    },
-    rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 4,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasPrice: 5000000000,
-      gasMultiplier: 2,
       ...accounts
     },
     goerli: {
@@ -96,62 +70,20 @@ const config: HardhatUserConfig = {
       gasMultiplier: 2,
       ...accounts
     },
-    kovan: {
-      url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 42,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasPrice: 20000000000,
-      gasMultiplier: 2,
-      ...accounts
-    },
-    polygon: {
-      url: "https://rpc-mainnet.maticvigil.com",
-      chainId: 137,
-      live: true,
-      saveDeployments: true,
-      ...accounts
-    },
-    polygonMumbai: {
-      url: "https://rpc-mumbai.maticvigil.com/",
-      chainId: 80001,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasMultiplier: 2,
-      ...accounts
-    },
-    bsc: {
-      url: "https://bsc-dataseed.binance.org",
-      chainId: 56,
-      live: true,
-      saveDeployments: true,
-      ...accounts
-    },
-    "bsc-testnet": {
-      url: "https://data-seed-prebsc-2-s3.binance.org:8545",
-      chainId: 97,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasMultiplier: 2,
-      ...accounts
-    },
   },
   etherscan: {
     apiKey: {
-        mainnet: process.env.ETHERSCAN,
-        ropsten: process.env.ETHERSCAN,
-        rinkeby: process.env.ETHERSCAN,
-        goerli: process.env.ETHERSCAN,
-        kovan: process.env.ETHERSCAN,
-        // ftm
-        opera: process.env.FTMSCAN,
-        ftmTestnet: process.env.FTMSCAN,
-        // polygon
-        polygon: process.env.POLYGONSCAN,
-        polygonMumbai: process.env.POLYGONSCAN,
+      mainnet: process.env.ETHERSCAN,
+      ropsten: process.env.ETHERSCAN,
+      rinkeby: process.env.ETHERSCAN,
+      goerli: process.env.ETHERSCAN,
+      kovan: process.env.ETHERSCAN,
+      // ftm
+      opera: process.env.FTMSCAN,
+      ftmTestnet: process.env.FTMSCAN,
+      // polygon
+      polygon: process.env.POLYGONSCAN,
+      polygonMumbai: process.env.POLYGONSCAN,
     }
   },
   paths: {

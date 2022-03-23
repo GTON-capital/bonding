@@ -3,6 +3,7 @@ pragma solidity >=0.8.0;
 
 import { IBasicBonding } from "./interfaces/IBasicBonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
+import { IWhitelist } from "./interfaces/IWhitelist.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { Staking } from "@gton/staking/contracts/Staking.sol";
@@ -46,8 +47,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
      * Mofidier checks if bonding period is open and provides access to the function
      * It is used for mint function.
      */
+
     modifier mintEnabled() {
-        require(isBondingActive(), 
+        require(isWhitelistActive || isBondingActive(), 
             "Bonding: Mint is not available in this period");
         _;
     }
@@ -67,7 +69,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     uint public bondLimit;
     uint public bondCounter;
     uint public discountNominator;
+    bool public isWhitelistActive;
     mapping (uint => BondData) public activeBonds;
+    IWhitelist public whitelist;
 
     struct BondData {
         bool isActive;
@@ -165,6 +169,11 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
+        if(isWhitelistActive) {
+            uint allowedAllocation = whitelist.allowedAllocation(user);
+            require(sgtonAmount <= allowedAllocation, "Bonding: You are not allowed for this allocation");
+            whitelist.updateAllocation(user, allowedAllocation - sgtonAmount);
+        }
         uint reward = getStakingReward(sgtonAmount);
         uint bondReward = sgtonAmount + reward;
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
@@ -223,6 +232,14 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     function setBondLimit(uint _bondLimit) public onlyOwner {
         bondLimit = _bondLimit;
+    }
+
+    function setWhitelist(IWhitelist _whitelist) public onlyOwner {
+        whitelist = _whitelist;
+    }
+
+    function toggleWhitelist() public onlyOwner {
+        isWhitelistActive = !isWhitelistActive;
     }
     
     function transferToken(ERC20 _token, address user) public onlyOwner {

@@ -38,7 +38,8 @@ contract BondingETH is ABonding {
             _gton,
             _sgton,
             _bondType
-        ){}
+        )
+        {}
 
      /* ========== RESTRICTED ========== */
 
