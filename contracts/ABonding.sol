@@ -11,9 +11,9 @@ import { Staking } from "@gton/staking/contracts/Staking.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-
-abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
+abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGuard {
 
     constructor(
         uint _bondLimit, 
@@ -71,6 +71,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     uint public discountNominator;
     bool public isWhitelistActive;
     mapping (uint => BondData) public activeBonds;
+    mapping(address => uint[]) public userBonds;
     IWhitelist public whitelist;
 
     struct BondData {
@@ -165,7 +166,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function _mint(uint amount, address user, uint releaseTimestamp) internal returns(uint id) {
+    function _mint(uint amount, address user, uint releaseTimestamp) internal nonReentrant returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
@@ -176,11 +177,12 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
         }
         uint reward = getStakingReward(sgtonAmount);
         uint bondReward = sgtonAmount + reward;
+
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
-
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, bondReward);
-
+        userBonds[user].push(id);
         bondCounter++;
+
         emit Mint(id, user);
         emit MintData(address(token), bondReward, releaseTimestamp, bondType());
     }
@@ -243,6 +245,6 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder {
     }
     
     function transferToken(ERC20 _token, address user) public onlyOwner {
-        _token.transfer(user, _token.balanceOf(address(this)));
+        require(_token.transfer(user, _token.balanceOf(address(this))));
     }
 }

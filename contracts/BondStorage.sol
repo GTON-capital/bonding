@@ -6,6 +6,8 @@ import { AdminAccess } from "./access/AdminAccess.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
+// Mock storage for testing purposes
+
 contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
 
     constructor(
@@ -41,5 +43,4 @@ contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
         require(ownerOf(tokenId) == msg.sender, "BondStorage: You are not the owner");
         _transfer(msg.sender, to, tokenId);
     }
-
 }
