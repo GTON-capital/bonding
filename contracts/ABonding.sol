@@ -6,7 +6,7 @@ import { IBondStorage } from "./interfaces/IBondStorage.sol";
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -16,16 +16,16 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGuard {
 
     constructor(
-        uint _bondLimit, 
-        uint _bondActivePeriod, 
+        uint _bondLimit,
+        uint _bondActivePeriod,
         uint _bondToClaimPeriod, 
         uint _discountNominator,
-        IBondStorage _bondStorage, 
+        IBondStorage _bondStorage,
         AggregatorV3Interface _tokenAggregator,
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        Staking _sgton,
+        IStaking _sgton,
         string memory bondType
         ) {
         bondLimit = _bondLimit;
@@ -83,7 +83,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
 
     ERC20 immutable public token;
     ERC20 immutable  public gton;
-    Staking immutable public sgton;
+    IStaking immutable public sgton;
     IBondStorage immutable public bondStorage;
     AggregatorV3Interface public tokenAggregator;
     AggregatorV3Interface public gtonAggregator;
@@ -101,9 +101,9 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     /**
      * Function calculates amount of token to be earned with the `amount` by the bond duration time
      */
-    function getStakingReward(uint amount) public view returns(uint) {
+    function getStakingReward(uint amount) public returns(uint) {
         uint stakingN = sgton.aprBasisPoints();
-        uint stakingD = sgton.aprDenominator();
+        uint stakingD = sgton.aprDenominator(); 
         uint calcDecimals = sgton.calcDecimals();
         uint secondsInYear = sgton.secondsInYear();
         uint yearEarn = amount * calcDecimals * stakingN / stakingD;

@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -15,7 +15,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     constructor(
         IBondStorage _bondStorage, 
         ERC20 _gton,
-        Staking _sgton
+        IStaking _sgton
         ) {
             bondStorage =  _bondStorage;
             gton =  _gton;
@@ -35,7 +35,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     }
 
     ERC20 immutable  public gton;
-    Staking immutable public sgton;
+    IStaking immutable public sgton;
     IBondStorage immutable public bondStorage;
 
     /* ========== VIEWS ========== */
