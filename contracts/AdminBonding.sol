@@ -47,7 +47,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     /**
      * Function returns total amount of bonds issued by this contract
      */
-    function totalSupply() public view returns(uint) {
+    function totalSupply() external view returns(uint) {
         return bondCounter;
     }
 
@@ -56,7 +56,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     /**
      * Function receives the bond from user and updates users balance with sgton
      */
-    function claim(uint tokenId) public {
+    function claim(uint tokenId) external {
         // No need to add checks if bond was issued on this contract because the id of bond is unique
         require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
         bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
@@ -70,7 +70,7 @@ contract AdminBonding is Ownable, ERC721Holder {
 
      /* ========== RESTRICTED ========== */
     
-    function mint(uint bondReward, address user, uint releaseTimestamp, bytes memory _bondType) public onlyOwner returns(uint id) {
+    function mint(uint bondReward, address user, uint releaseTimestamp, bytes memory _bondType) external onlyOwner returns(uint id) {
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
 
@@ -79,7 +79,7 @@ contract AdminBonding is Ownable, ERC721Holder {
         emit MintData(address(gton), bondReward, releaseTimestamp, _bondType);
     }
 
-    function transferToken(ERC20 _token, address user) public onlyOwner {
+    function transferToken(ERC20 _token, address user) external onlyOwner {
         _token.transfer(user, _token.balanceOf(address(this)));
     }
 

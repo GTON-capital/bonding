@@ -160,7 +160,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     /**
      * Function returns total amount of bonds issued by this contract
      */
-    function totalSupply() public view override returns(uint) {
+    function totalSupply() external view override returns(uint) {
         return bondCounter;
     }
 
@@ -190,7 +190,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     /**
      * Function receives the bond from user and updates users balance with sgton
      */
-    function claim(uint tokenId) public override {
+    function claim(uint tokenId) external override {
         // No need to add checks if bond was issued on this contract because the id of bond is unique
         require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
         bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
@@ -207,44 +207,44 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     /**
      * Function starts issue bonding period
      */
-    function startBonding() public override onlyOwner {
+    function startBonding() external override onlyOwner {
         require(!isBondingActive(), "Bonding: Bonding is already active");
         lastBondActivation = block.timestamp;
     }
 
-    function setGtonAggregator(AggregatorV3Interface agg) public onlyOwner {
+    function setGtonAggregator(AggregatorV3Interface agg) external onlyOwner {
         gtonAggregator = agg;
     }
 
-    function setTokenAggregator(AggregatorV3Interface agg) public onlyOwner {
+    function setTokenAggregator(AggregatorV3Interface agg) external onlyOwner {
         tokenAggregator = agg;
     }
 
-    function setDiscountNominator(uint _discountN) public onlyOwner {
+    function setDiscountNominator(uint _discountN) external onlyOwner {
         discountNominator = _discountN;
     }
 
-    function setBondActivePeriod(uint _bondActivePeriod) public onlyOwner {
+    function setBondActivePeriod(uint _bondActivePeriod) external onlyOwner {
         bondActivePeriod = _bondActivePeriod;
     }
 
-    function setBondToClaimPeriod(uint _bondToClaimPeriod) public onlyOwner {
+    function setBondToClaimPeriod(uint _bondToClaimPeriod) external onlyOwner {
         bondToClaimPeriod = _bondToClaimPeriod;
     }
 
-    function setBondLimit(uint _bondLimit) public onlyOwner {
+    function setBondLimit(uint _bondLimit) external onlyOwner {
         bondLimit = _bondLimit;
     }
 
-    function setWhitelist(IWhitelist _whitelist) public onlyOwner {
+    function setWhitelist(IWhitelist _whitelist) external onlyOwner {
         whitelist = _whitelist;
     }
 
-    function toggleWhitelist() public onlyOwner {
+    function toggleWhitelist() external onlyOwner {
         isWhitelistActive = !isWhitelistActive;
     }
     
-    function transferToken(ERC20 _token, address user) public onlyOwner {
+    function transferToken(ERC20 _token, address user) external onlyOwner {
         require(_token.transfer(user, _token.balanceOf(address(this))));
     }
 }

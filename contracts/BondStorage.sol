@@ -23,12 +23,12 @@ contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
     mapping(uint => uint) public rewards;
     string public bondTokenSymbol;
 
-    function userIdsLength(address user) public view returns(uint) {
+    function userIdsLength(address user) external view returns(uint) {
         return userIds[user].length;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
-    function mint(address to, uint releaseTimestamp, uint reward) public override onlyAdminOrOwner returns(uint tokenId) {
+    function mint(address to, uint releaseTimestamp, uint reward) external override onlyAdminOrOwner returns(uint tokenId) {
         tokenId = tokenCounter;
         _safeMint(to, tokenCounter);
         userIds[to].push(tokenId);
@@ -39,7 +39,7 @@ contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
         tokenCounter++;
     }
 
-    function transfer(address to, uint tokenId) public {
+    function transfer(address to, uint tokenId) external {
         require(ownerOf(tokenId) == msg.sender, "BondStorage: You are not the owner");
         _transfer(msg.sender, to, tokenId);
     }
