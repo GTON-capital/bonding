@@ -26,7 +26,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
         ERC20 _token,
         ERC20 _gton,
         IStaking _sgton,
-        string memory bondType
+        string memory bondType_
         ) {
         bondLimit = _bondLimit;
         bondActivePeriod = _bondActivePeriod;
@@ -38,7 +38,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
         token = _token;
         gton = _gton;
         sgton = _sgton;
-        _bondType = bytes(bondType);
+        _bondType = bytes(bondType_);
     }
 
     /* ========== MODIFIERS  ========== */
@@ -101,7 +101,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     /**
      * Function calculates amount of token to be earned with the `amount` by the bond duration time
      */
-    function getStakingReward(uint amount) public returns(uint) {
+    function getStakingReward(uint amount) public view returns(uint) {
         uint stakingN = sgton.aprBasisPoints();
         uint stakingD = sgton.aprDenominator(); 
         uint calcDecimals = sgton.calcDecimals();
