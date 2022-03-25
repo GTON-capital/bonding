@@ -23,5 +23,4 @@ abstract contract AdminAccess is Ownable {
     function unsetAdmin(address user) public onlyOwner {
         admins[user] = false;
     }
-
 }

@@ -5,7 +5,7 @@ import { ABonding } from "./ABonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -24,7 +24,7 @@ contract Bonding is ABonding {
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        Staking _sgton,
+        IStaking _sgton,
         string memory _bondType
         ) ABonding(
             _bondLimit, 
@@ -45,8 +45,8 @@ contract Bonding is ABonding {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public mintEnabled returns(uint id) {
-        token.transferFrom(msg.sender, address(this), amount);
+    function mint(uint amount) external mintEnabled returns(uint id) {
+        require(token.transferFrom(msg.sender, address(this), amount));
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);
     }

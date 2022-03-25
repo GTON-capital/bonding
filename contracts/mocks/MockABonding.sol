@@ -5,7 +5,7 @@ import { ABonding } from "../ABonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -24,7 +24,7 @@ contract MockABonding is ABonding {
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        Staking _sgton,
+        IStaking _sgton,
         string memory _bondType
         ) ABonding(
             _bondLimit, 

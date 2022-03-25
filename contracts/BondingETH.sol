@@ -5,7 +5,7 @@ import { ABonding } from "./ABonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -24,7 +24,7 @@ contract BondingETH is ABonding {
         AggregatorV3Interface _gtonAggregator,
         ERC20 _token,
         ERC20 _gton,
-        Staking _sgton,
+        IStaking _sgton,
         string memory _bondType
         ) ABonding(
             _bondLimit, 
@@ -46,13 +46,13 @@ contract BondingETH is ABonding {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) public payable mintEnabled returns(uint id) {
+    function mint(uint amount) external payable mintEnabled returns(uint id) {
         require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);
     }
 
-    function transferNative(address payable to) public onlyOwner {
+    function transferNative(address payable to) external onlyOwner {
         to.transfer(address(this).balance);
     }
 }

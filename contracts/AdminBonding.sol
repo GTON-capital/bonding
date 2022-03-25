@@ -4,7 +4,7 @@ pragma solidity >=0.8.0;
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { Staking } from "@gton/staking/contracts/Staking.sol";
+import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -15,7 +15,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     constructor(
         IBondStorage _bondStorage, 
         ERC20 _gton,
-        Staking _sgton
+        IStaking _sgton
         ) {
             bondStorage =  _bondStorage;
             gton =  _gton;
@@ -35,7 +35,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     }
 
     ERC20 immutable  public gton;
-    Staking immutable public sgton;
+    IStaking immutable public sgton;
     IBondStorage immutable public bondStorage;
 
     /* ========== VIEWS ========== */
@@ -47,7 +47,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     /**
      * Function returns total amount of bonds issued by this contract
      */
-    function totalSupply() public view returns(uint) {
+    function totalSupply() external view returns(uint) {
         return bondCounter;
     }
 
@@ -56,7 +56,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     /**
      * Function receives the bond from user and updates users balance with sgton
      */
-    function claim(uint tokenId) public {
+    function claim(uint tokenId) external {
         // No need to add checks if bond was issued on this contract because the id of bond is unique
         require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
         bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
@@ -70,7 +70,7 @@ contract AdminBonding is Ownable, ERC721Holder {
 
      /* ========== RESTRICTED ========== */
     
-    function mint(uint bondReward, address user, uint releaseTimestamp, bytes memory _bondType) public onlyOwner returns(uint id) {
+    function mint(uint bondReward, address user, uint releaseTimestamp, bytes memory _bondType) external onlyOwner returns(uint id) {
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, _bondType, bondReward);
 
@@ -79,7 +79,7 @@ contract AdminBonding is Ownable, ERC721Holder {
         emit MintData(address(gton), bondReward, releaseTimestamp, _bondType);
     }
 
-    function transferToken(ERC20 _token, address user) public onlyOwner {
+    function transferToken(ERC20 _token, address user) external onlyOwner {
         _token.transfer(user, _token.balanceOf(address(this)));
     }
 
