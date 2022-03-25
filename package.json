@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@chainlink/contracts": "^0.3.1",
-    "@gton/staking": "git+https://github.com/GTON-capital/staking.git",
+    "@gton/staking": "github:GTON-capital/staking#releases/01-Fantom",
     "@openzeppelin/contracts": "^4.4.2",
     "dotenv": "^16.0.0"
   }
