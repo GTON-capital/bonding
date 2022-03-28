@@ -30,13 +30,16 @@ contract BondStorage is IBondStorage, ERC721Burnable, AdminAccess {
     /* ========== MUTATIVE FUNCTIONS ========== */
     function mint(address to, uint releaseTimestamp, uint reward) external override onlyAdminOrOwner returns(uint tokenId) {
         tokenId = tokenCounter;
-        _safeMint(to, tokenCounter);
+        // it always increases and we will never mint the same id
+        tokenCounter++;
+        //_safeMint(to, tokenCounter);
+        _safeMint(to, tokenCounter - 1);
         userIds[to].push(tokenId);
         issuedBy[tokenId] = msg.sender;
         releaseDates[tokenId] = "Test date string";
         rewards[tokenId] = reward;
         // it always increases and we will never mint the same id
-        tokenCounter++;
+        //tokenCounter++;
     }
 
     function transfer(address to, uint tokenId) external {
