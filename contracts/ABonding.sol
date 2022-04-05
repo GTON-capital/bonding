@@ -107,7 +107,7 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
         uint calcDecimals = sgton.calcDecimals();
         uint secondsInYear = sgton.secondsInYear();
         uint yearEarn = amount * calcDecimals * stakingN / stakingD;
-        return yearEarn * bondToClaimPeriod / secondsInYear / calcDecimals; 
+        return yearEarn * bondToClaimPeriod / secondsInYear / calcDecimals;
     }
 
     /**
@@ -170,7 +170,8 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
         uint sgtonAmount = bondAmountOut(amountWithoutDis);
-        if(isWhitelistActive) {
+        bondCounter++;
+        if (isWhitelistActive) {
             uint allowedAllocation = whitelist.allowedAllocation(user);
             require(sgtonAmount <= allowedAllocation, "Bonding: You are not allowed for this allocation");
             whitelist.updateAllocation(user, allowedAllocation - sgtonAmount);
@@ -181,7 +182,6 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
         id = bondStorage.mint(user, releaseTimestamp, bondReward);
         activeBonds[id] = BondData(true, block.timestamp, releaseTimestamp, bondReward);
         userBonds[user].push(id);
-        bondCounter++;
 
         emit Mint(id, user);
         emit MintData(address(token), bondReward, releaseTimestamp, bondType());
@@ -193,11 +193,13 @@ abstract contract ABonding is IBasicBonding, Ownable, ERC721Holder, ReentrancyGu
     function claim(uint tokenId) external override {
         // No need to add checks if bond was issued on this contract because the id of bond is unique
         require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
-        bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
-        BondData storage bond = activeBonds[tokenId];   
-        require(bond.releaseTimestamp <= block.timestamp, "Bonding: Bond is locked to claim now");
+        BondData storage bond = activeBonds[tokenId];
         bond.isActive = false;
-        gton.approve(address(sgton), bond.releaseAmount);
+
+        require(bond.releaseTimestamp <= block.timestamp, "Bonding: Bond is locked to claim now");
+        bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
+
+        if (!(gton.approve(address(sgton), bond.releaseAmount))) { revert(); }
         sgton.stake(bond.releaseAmount, msg.sender);
         emit Claim(msg.sender, tokenId);
     }

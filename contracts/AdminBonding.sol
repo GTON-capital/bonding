@@ -59,11 +59,13 @@ contract AdminBonding is Ownable, ERC721Holder {
     function claim(uint tokenId) external {
         // No need to add checks if bond was issued on this contract because the id of bond is unique
         require(isActiveBond(tokenId), "Bonding: Cannot claim inactive bond");
-        bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
-        BondData storage bond = activeBonds[tokenId];   
-        require(bond.releaseTimestamp <= block.timestamp, "Bonding: Bond is locked to claim now");
+        BondData storage bond = activeBonds[tokenId];
         bond.isActive = false;
-        gton.approve(address(sgton), bond.releaseAmount);
+
+        require(bond.releaseTimestamp <= block.timestamp, "Bonding: Bond is locked to claim now");
+        bondStorage.safeTransferFrom(msg.sender, address(this), tokenId);
+        
+        if (!(gton.approve(address(sgton), bond.releaseAmount))) { revert(); }
         sgton.stake(bond.releaseAmount, msg.sender);
         emit Claim(msg.sender, tokenId);
     }
@@ -80,7 +82,7 @@ contract AdminBonding is Ownable, ERC721Holder {
     }
 
     function transferToken(ERC20 _token, address user) external onlyOwner {
-        _token.transfer(user, _token.balanceOf(address(this)));
+        if (!(_token.transfer(user, _token.balanceOf(address(this))))) { revert(); }
     }
 
     /**
