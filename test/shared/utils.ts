@@ -16,7 +16,10 @@ export function expandToDecimals(n: BigNumberish, _decimals: number): BigNumber 
 }
 
 export function extractTokenId(receipt: ContractReceipt): BigNumber {
-  const event = receipt.events.find(event => event.event === 'Mint');
+  const event = receipt.events?.find(event => event.event === 'Mint');
+  if (event == undefined || event?.args == undefined) {
+    throw new Error("Missing receipt events")
+  }
   const [id] = event.args;
   return id;
 }

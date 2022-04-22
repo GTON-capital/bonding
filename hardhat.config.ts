@@ -22,7 +22,7 @@ let accounts = {
   accounts: [process.env.PRIVATEKEY]
 }
 
-const config: HardhatUserConfig = {
+module.exports = {
   abiExporter: {
     path: "./abi",
     clear: false,
@@ -133,5 +133,3 @@ const config: HardhatUserConfig = {
     },
   },
 }
-
-export default config
