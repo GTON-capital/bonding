@@ -2,7 +2,6 @@
 
 import "@nomiclabs/hardhat-etherscan"
 import "@nomiclabs/hardhat-solhint"
-import "@tenderly/hardhat-tenderly"
 import "@nomiclabs/hardhat-waffle"
 import "hardhat-abi-exporter"
 import "hardhat-deploy"
@@ -116,10 +115,6 @@ module.exports = {
         version: "0.5.17"
       },
     ],
-  },
-  tenderly: {
-    project: process.env.TENDERLY_PROJECT!,
-    username: process.env.TENDERLY_USERNAME!,
   },
   typechain: {
     outDir: "types",
