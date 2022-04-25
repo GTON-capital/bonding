@@ -1,4 +1,5 @@
-import { ethers, waffle } from "hardhat"
+const { ethers } = require("hardhat");
+const { waffle } = require("hardhat");
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 
