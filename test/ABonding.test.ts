@@ -4,11 +4,14 @@ import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
 
-import { BondStorage } from "../types/BondStorage"
-import { MockAggregator } from "../types/MockAggregator"
-import { MockABonding } from "../types/MockABonding"
-import { MockERC20 } from "../types/MockERC20"
-import { MockStaking } from "../types/MockStaking"
+import { 
+    BondStorage,
+    MockAggregator,
+    MockABonding,
+    MockERC20,
+    MockStaking
+} from "../types"
+
 import { BigNumber, BigNumberish, Wallet } from "ethers"
 
 use(solidity)
@@ -79,7 +82,7 @@ describe("Bonding", function () {
     })
 
     it("Cannot activate active bonding and check access", async () => {
-        await expect(bonding.connect(alice).startBonding()).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(bonding.connect(alice).startBonding()).to.be.revertedWith("Not owner");
         await expect(bonding.startBonding()).to.be.revertedWith("Bonding: Bonding is already active");
     })
 
@@ -113,31 +116,31 @@ describe("Bonding", function () {
     })
 
     it("Access private functions check", async () => {
-        await expect(bonding.connect(alice).setGtonAggregator(tokenAgg.address)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setGtonAggregator(tokenAgg.address)).to.be.revertedWith("Not owner")
         await bonding.setGtonAggregator(tokenAgg.address)
         expect(await bonding.gtonAggregator()).to.eq(tokenAgg.address);
 
-        await expect(bonding.connect(alice).setTokenAggregator(gtonAgg.address)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setTokenAggregator(gtonAgg.address)).to.be.revertedWith("Not owner")
         await bonding.setTokenAggregator(gtonAgg.address)
         expect(await bonding.tokenAggregator()).to.eq(gtonAgg.address);
 
         const nominator = 1000
-        await expect(bonding.connect(alice).setDiscountNominator(nominator)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setDiscountNominator(nominator)).to.be.revertedWith("Not owner")
         await bonding.setDiscountNominator(nominator)
         expect(await bonding.discountNominator()).to.eq(nominator);
 
         const activePeriod = 199002234
-        await expect(bonding.connect(alice).setBondActivePeriod(activePeriod)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setBondActivePeriod(activePeriod)).to.be.revertedWith("Not owner")
         await bonding.setBondActivePeriod(activePeriod)
         expect(await bonding.bondActivePeriod()).to.eq(activePeriod);
 
         const bondToClaimPeriod = 199002234
-        await expect(bonding.connect(alice).setBondToClaimPeriod(bondToClaimPeriod)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setBondToClaimPeriod(bondToClaimPeriod)).to.be.revertedWith("Not owner")
         await bonding.setBondToClaimPeriod(bondToClaimPeriod)
         expect(await bonding.bondToClaimPeriod()).to.eq(bondToClaimPeriod);
 
         const bondLimit = 199002234
-        await expect(bonding.connect(alice).setBondLimit(bondLimit)).to.be.revertedWith("Ownable: caller is not the owner")
+        await expect(bonding.connect(alice).setBondLimit(bondLimit)).to.be.revertedWith("Not owner")
         await bonding.setBondLimit(bondLimit)
         expect(await bonding.bondLimit()).to.eq(bondLimit);
 
@@ -145,7 +148,7 @@ describe("Bonding", function () {
 
     it("Can transfer funds from contract", async () => {
         // works because of empty contract eth stoarge
-        await expect(bonding.connect(alice).transferToken(token.address, alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(bonding.connect(alice).transferToken(token.address, alice.address)).to.be.revertedWith("Not owner");
         const amount = expandTo18Decimals(100)
         await token.transfer(bonding.address, amount)
         const balanceBefore = await token.balanceOf(alice.address);

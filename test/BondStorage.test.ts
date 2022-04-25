@@ -3,7 +3,7 @@ const { waffle } = require("hardhat");
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 
-import { BondStorage } from "../types/BondStorage"
+import { BondStorage } from "../types"
 
 use(solidity)
 

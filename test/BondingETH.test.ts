@@ -4,12 +4,14 @@ import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
 
-import { BondStorage } from "../types/BondStorage"
-import { MockAggregator } from "../types/MockAggregator"
-import { BondingETH } from "../types/BondingETH"
-import { MockERC20 } from "../types/MockERC20"
-import { MockStaking } from "../types/MockStaking"
-import { BigNumber, BigNumberish, Wallet } from "ethers"
+import { 
+    BondStorage,
+    MockAggregator,
+    Bonding,
+    BondingETH,
+    MockERC20,
+    MockStaking
+} from "../types"
 
 use(solidity)
 
@@ -101,7 +103,7 @@ describe("BondingETH", function () {
 
     it("Can transfer native token from contract", async () => {
         // works because of empty contract eth stoarge
-        await expect(bonding.connect(alice).transferNative(alice.address)).to.be.revertedWith("Ownable: caller is not the owner");
+        await expect(bonding.connect(alice).transferNative(alice.address)).to.be.revertedWith("Not owner");
         const amount = expandTo18Decimals(100)
         await bonding.mint(amount, { value: amount }) // mint to be sure that balance is not 0
         const balanceBefore = await waffle.provider.getBalance(alice.address);

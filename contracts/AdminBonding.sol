@@ -5,23 +5,23 @@ import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { IStaking } from "./interfaces/IStaking.sol";
+import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract AdminBonding is Ownable, ERC721Holder {
+contract AdminBonding is InitializableOwnable, ERC721Holder {
 
     constructor(
         IBondStorage _bondStorage, 
         ERC20 _gton,
         IStaking _sgton
         ) {
+            initOwner(msg.sender);
             bondStorage =  _bondStorage;
             gton =  _gton;
             sgton = _sgton;
         }
-
 
     uint public bondCounter;
     mapping (uint => BondData) public activeBonds;

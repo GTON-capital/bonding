@@ -4,12 +4,13 @@ import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
 import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
 
-import { BondStorage } from "../types/BondStorage"
-import { MockAggregator } from "../types/MockAggregator"
-import { Bonding } from "../types/Bonding"
-import { MockERC20 } from "../types/MockERC20"
-import { MockStaking } from "../types/MockStaking"
-import { BigNumber, BigNumberish, Wallet } from "ethers"
+import { 
+    BondStorage,
+    MockAggregator,
+    Bonding,
+    MockERC20,
+    MockStaking
+} from "../types"
 
 use(solidity)
 
