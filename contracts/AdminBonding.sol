@@ -13,14 +13,14 @@ import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721H
 contract AdminBonding is InitializableOwnable, ERC721Holder {
 
     constructor(
-        IBondStorage _bondStorage, 
-        ERC20 _gton,
-        IStaking _sgton
+        IBondStorage bondStorage_, 
+        ERC20 gton_,
+        IStaking sgton_
         ) {
             initOwner(msg.sender);
-            bondStorage =  _bondStorage;
-            gton =  _gton;
-            sgton = _sgton;
+            bondStorage =  bondStorage_;
+            gton =  gton_;
+            sgton = sgton_;
         }
 
     uint public bondCounter;

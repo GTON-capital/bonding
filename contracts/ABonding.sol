@@ -16,30 +16,30 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder, ReentrancyGuard {
 
     constructor(
-        uint _bondLimit,
-        uint _bondActivePeriod,
-        uint _bondToClaimPeriod, 
-        uint _discountNominator,
-        IBondStorage _bondStorage,
-        AggregatorV3Interface _tokenAggregator,
-        AggregatorV3Interface _gtonAggregator,
-        ERC20 _token,
-        ERC20 _gton,
-        IStaking _sgton,
+        uint bondLimit_,
+        uint bondActivePeriod_,
+        uint bondToClaimPeriod_, 
+        uint discountNominator_,
+        IBondStorage bondStorage_,
+        AggregatorV3Interface tokenAggregator_,
+        AggregatorV3Interface gtonAggregator_,
+        ERC20 token_,
+        ERC20 gton_,
+        IStaking sgton_,
         string memory bondType_
         ) {
         initOwner(msg.sender);
-        bondLimit = _bondLimit;
-        bondActivePeriod = _bondActivePeriod;
-        bondToClaimPeriod = _bondToClaimPeriod;
-        discountNominator = _discountNominator;
-        bondStorage = _bondStorage;
-        tokenAggregator = _tokenAggregator;
-        gtonAggregator = _gtonAggregator;
-        token = _token;
-        gton = _gton;
-        sgton = _sgton;
-        _bondType = bytes(bondType_);
+        bondLimit = bondLimit_;
+        bondActivePeriod = bondActivePeriod_;
+        bondToClaimPeriod = bondToClaimPeriod_;
+        discountNominator = discountNominator_;
+        bondStorage = bondStorage_;
+        tokenAggregator = tokenAggregator_;
+        gtonAggregator = gtonAggregator_;
+        token = token_;
+        gton = gton_;
+        sgton = sgton_;
+        bondTypeBytes = bytes(bondType_);
     }
 
     /* ========== MODIFIERS  ========== */
@@ -61,7 +61,7 @@ abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder,
 
     /* ========== STATE VARIABLES ========== */
 
-    bytes _bondType;
+    bytes bondTypeBytes;
     uint public lastBondActivation;
     // amount in ms. Shows amount of time when this contract can issue the bonds
     uint public bondActivePeriod;
@@ -96,7 +96,7 @@ abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder,
     }
 
     function bondType() public view returns(string memory) {
-        return string(_bondType);
+        return string(bondTypeBytes);
     }
 
     /**
@@ -121,9 +121,9 @@ abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder,
     /**
      * Function that returns data from aggregator
      */
-    function tokenPriceAndDecimals(AggregatorV3Interface _token) internal view returns (int256 price, uint decimals) {
-        decimals = _token.decimals();
-        (, price,,,) = _token.latestRoundData();
+    function tokenPriceAndDecimals(AggregatorV3Interface token_) internal view returns (int256 price, uint decimals) {
+        decimals = token_.decimals();
+        (, price,,,) = token_.latestRoundData();
     }
 
     /**
@@ -213,41 +213,57 @@ abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder,
     function startBonding() external override onlyOwner {
         require(!isBondingActive(), "Bonding: Bonding is already active");
         lastBondActivation = block.timestamp;
+        emit BondingStarted(lastBondActivation, bondActivePeriod);
     }
 
     function setGtonAggregator(AggregatorV3Interface agg) external onlyOwner {
+        address oldValue = address(gtonAggregator);
         gtonAggregator = agg;
+        emit SetGtonAggregator(oldValue, address(agg));
     }
 
     function setTokenAggregator(AggregatorV3Interface agg) external onlyOwner {
+        address oldValue = address(tokenAggregator);
         tokenAggregator = agg;
+        emit SetTokenAggregator(oldValue, address(agg));
     }
 
-    function setDiscountNominator(uint _discountN) external onlyOwner {
-        discountNominator = _discountN;
+    function setDiscountNominator(uint discountN_) external onlyOwner {
+        uint oldValue = discountNominator;
+        discountNominator = discountN_;
+        emit SetDiscountNominator(oldValue, discountN_);
     }
 
-    function setBondActivePeriod(uint _bondActivePeriod) external onlyOwner {
-        bondActivePeriod = _bondActivePeriod;
+    function setBondActivePeriod(uint bondActivePeriod_) external onlyOwner {
+        uint oldValue = bondActivePeriod;
+        bondActivePeriod = bondActivePeriod_;
+        emit SetBondActivePeriod(oldValue, bondActivePeriod_);
     }
 
-    function setBondToClaimPeriod(uint _bondToClaimPeriod) external onlyOwner {
-        bondToClaimPeriod = _bondToClaimPeriod;
+    function setBondToClaimPeriod(uint bondToClaimPeriod_) external onlyOwner {
+        uint oldValue = bondToClaimPeriod;
+        bondToClaimPeriod = bondToClaimPeriod_;
+        emit SetBondToClaimPeriod(oldValue, bondToClaimPeriod_);
     }
 
-    function setBondLimit(uint _bondLimit) external onlyOwner {
-        bondLimit = _bondLimit;
+    function setBondLimit(uint bondLimit_) external onlyOwner {
+        uint oldValue = bondLimit;
+        bondLimit = bondLimit_;
+        emit SetBondLimit(oldValue, bondLimit_);
     }
 
-    function setWhitelist(IWhitelist _whitelist) external onlyOwner {
-        whitelist = _whitelist;
+    function setWhitelist(IWhitelist whitelist_) external onlyOwner {
+        address oldValue = address(whitelist);
+        whitelist = whitelist_;
+        emit SetWhitelist(oldValue, address(whitelist_));
     }
 
     function toggleWhitelist() external onlyOwner {
         isWhitelistActive = !isWhitelistActive;
+        emit ToggleWhitelist(isWhitelistActive);
     }
     
-    function transferToken(ERC20 _token, address user) external onlyOwner {
-        require(_token.transfer(user, _token.balanceOf(address(this))));
+    function transferToken(ERC20 token_, address user) external onlyOwner {
+        require(token_.transfer(user, token_.balanceOf(address(this))));
     }
 }

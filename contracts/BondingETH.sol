@@ -13,31 +13,30 @@ import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721H
 contract BondingETH is ABonding {
 
     constructor(
-        uint _bondLimit, 
-        uint _bondActivePeriod, 
-        uint _bondToClaimPeriod, 
-        uint _discountNominator,
-        IBondStorage _bondStorage, 
-        AggregatorV3Interface _tokenAggregator,
-        AggregatorV3Interface _gtonAggregator,
-        ERC20 _token,
-        ERC20 _gton,
-        IStaking _sgton,
-        string memory _bondType
+        uint bondLimit_,
+        uint bondActivePeriod_,
+        uint bondToClaimPeriod_,
+        uint discountNominator_,
+        IBondStorage bondStorage_,
+        AggregatorV3Interface tokenAggregator_,
+        AggregatorV3Interface gtonAggregator_,
+        ERC20 token_,
+        ERC20 gton_,
+        IStaking sgton_,
+        string memory bondType_
         ) ABonding(
-            _bondLimit, 
-            _bondActivePeriod, 
-            _bondToClaimPeriod, 
-            _discountNominator,
-            _bondStorage, 
-            _tokenAggregator,
-            _gtonAggregator,
-            _token,
-            _gton,
-            _sgton,
-            _bondType
-        )
-        {}
+            bondLimit_,
+            bondActivePeriod_,
+            bondToClaimPeriod_,
+            discountNominator_,
+            bondStorage_,
+            tokenAggregator_,
+            gtonAggregator_,
+            token_,
+            gton_,
+            sgton_,
+            bondType_
+        ){}
 
      /* ========== RESTRICTED ========== */
 
