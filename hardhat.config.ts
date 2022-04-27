@@ -1,125 +1,88 @@
-// hardhat.config.ts
+require("@nomiclabs/hardhat-waffle");
 
-import "@nomiclabs/hardhat-etherscan"
-import "@nomiclabs/hardhat-solhint"
-import "@tenderly/hardhat-tenderly"
-import "@nomiclabs/hardhat-waffle"
-import "hardhat-abi-exporter"
-import "hardhat-deploy"
-import "hardhat-deploy-ethers"
-import "hardhat-gas-reporter"
-import "hardhat-typechain"
-import "hardhat-watcher"
-import "solidity-coverage"
-
+require('dotenv').config();
 import { resolve } from "path";
 import { config as dotenvConfig } from "dotenv";
 dotenvConfig({ path: resolve(__dirname, "./.env") });
 
-import { HardhatUserConfig } from "hardhat/types"
+const { 
+  PRIVATE_KEY, 
+  ETHERSCAN, 
+  POLYGONSCAN, 
+  FTMSCAN, 
+  INFURA_API_KEY 
+} = process.env;
 
-let accounts = {
-  accounts: [process.env.PRIVATEKEY]
-}
-
-const config: HardhatUserConfig = {
+module.exports = {
   abiExporter: {
     path: "./abi",
     clear: false,
     flat: true,
-    // only: [],
-    // except: []
   },
   defaultNetwork: "hardhat",
-  gasReporter: {
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
-    currency: "USD",
-    enabled: process.env.REPORT_GAS === "true",
-    excludeContracts: ["contracts/libraries/"],
+  networks: {
+    localhost: {
+      url: "http://127.0.0.1:8545",
+    },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: [PRIVATE_KEY],
+      gasPrice: 120 * 1000000000,
+      chainId: 1,
+    },
+    ftm: {
+      // url: "https://rpc.ankr.com/fantom",
+      url: "https://rpcapi-tracing.fantom.network",
+      accounts: [PRIVATE_KEY],
+    },
+    ftmTestnet: {
+      networkId: 4002,
+      url: "https://rpc.testnet.fantom.network",
+      accounts: [PRIVATE_KEY],
+      // gasPrice: 35000000000,
+    }
+  },
+  etherscan: {
+    apiKey: {
+        mainnet: ETHERSCAN,
+        ropsten: ETHERSCAN,
+        rinkeby: ETHERSCAN,
+        goerli: ETHERSCAN,
+        kovan: ETHERSCAN,
+        // ftm
+        opera: FTMSCAN,
+        ftmTestnet: FTMSCAN,
+        // polygon
+        polygon: POLYGONSCAN,
+        polygonMumbai: POLYGONSCAN,
+    }
   },
   mocha: {
     timeout: 20000,
   },
-  networks: {
-    localhost: {
-      live: false,
-      saveDeployments: true,
-      tags: ["local"],
+  namedAccounts: {
+    deployer: {
+      default: 0,
     },
-    hardhat: {
-      forking: {
-        enabled: process.env.FORKING === "true",
-        url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
-      },
-      live: false,
-      saveDeployments: true,
-      tags: ["test", "local"],
+    dev: {
+      // Default to 1
+      default: 2,
+      // dev address mainnet
+      // 1: "",
     },
-    "fantom-testnet": {
-      chainId: 4002,
-      url: "https://rpc.testnet.fantom.network",
-      ...accounts
-    },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
-      chainId: 5,
-      live: true,
-      saveDeployments: true,
-      tags: ["staging"],
-      gasPrice: 5000000000,
-      gasMultiplier: 2,
-      ...accounts
-    },
-  },
-  etherscan: {
-    apiKey: {
-      mainnet: process.env.ETHERSCAN,
-      ropsten: process.env.ETHERSCAN,
-      rinkeby: process.env.ETHERSCAN,
-      goerli: process.env.ETHERSCAN,
-      kovan: process.env.ETHERSCAN,
-      // ftm
-      opera: process.env.FTMSCAN,
-      ftmTestnet: process.env.FTMSCAN,
-      // polygon
-      polygon: process.env.POLYGONSCAN,
-      polygonMumbai: process.env.POLYGONSCAN,
-    }
   },
   paths: {
     artifacts: "artifacts",
     cache: "cache",
-    deploy: "deploy",
-    deployments: "deployments",
-    imports: "imports",
     sources: "contracts",
     tests: "test",
   },
   solidity: {
     compilers: [
       {
-        version: "0.6.12",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
-      },
-      {
-        version: "0.8.0"
-      },
-      {
-        version: "0.8.8"
-      },
-      {
-        version: "0.5.17"
-      },
+        version: "0.8.13"
+      }
     ],
-  },
-  tenderly: {
-    project: process.env.TENDERLY_PROJECT!,
-    username: process.env.TENDERLY_USERNAME!,
   },
   typechain: {
     outDir: "types",
@@ -133,5 +96,3 @@ const config: HardhatUserConfig = {
     },
   },
 }
-
-export default config

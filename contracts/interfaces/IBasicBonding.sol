@@ -32,6 +32,19 @@ interface IBasicBonding is IERC721Receiver {
     event Claim(address indexed user, uint tokenId);
 
     /**
+     * @dev A set of events for updating contract parameters
+     */
+    event SetGtonAggregator(address oldValue, address newValue);
+    event SetTokenAggregator(address oldValue, address newValue);
+    event SetDiscountNominator(uint oldValue, uint newValue);
+    event SetBondActivePeriod(uint oldValue, uint newValue);
+    event SetBondToClaimPeriod(uint oldValue, uint newValue);
+    event SetBondLimit(uint oldValue, uint newValue);
+    event SetWhitelist(address oldValue, address newValue);
+    event ToggleWhitelist(bool value);
+    event BondingStarted(uint timestamp, uint duration);
+
+    /**
      * @dev Function calculates amount of token out
      * Params:
      * - amountIn - token amount to be spended by user

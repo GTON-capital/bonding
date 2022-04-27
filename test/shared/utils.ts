@@ -1,5 +1,6 @@
 import { BigNumber, BigNumberish } from "ethers"
 import { ContractReceipt } from "ethers"
+
 export const timestampSetter: (provider: any) => (timestamp: number) => Promise<void> =
   (provider) => async (timestamp: number) => await provider.send("evm_mine", [timestamp])
 
@@ -16,7 +17,10 @@ export function expandToDecimals(n: BigNumberish, _decimals: number): BigNumber 
 }
 
 export function extractTokenId(receipt: ContractReceipt): BigNumber {
-  const event = receipt.events.find(event => event.event === 'Mint');
+  const event = receipt.events?.find(event => event.event === 'Mint');
+  if (event == undefined || event?.args == undefined) {
+    throw new Error("Missing receipt events")
+  }
   const [id] = event.args;
   return id;
 }

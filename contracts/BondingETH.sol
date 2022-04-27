@@ -1,45 +1,42 @@
 //SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0;
+pragma solidity 0.8.13;
 
 import { ABonding } from "./ABonding.sol";
 import { IBondStorage } from "./interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "@gton/staking/contracts/interfaces/IStaking.sol";
+import { IStaking } from "./interfaces/IStaking.sol";
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-
 
 contract BondingETH is ABonding {
 
     constructor(
-        uint _bondLimit, 
-        uint _bondActivePeriod, 
-        uint _bondToClaimPeriod, 
-        uint _discountNominator,
-        IBondStorage _bondStorage, 
-        AggregatorV3Interface _tokenAggregator,
-        AggregatorV3Interface _gtonAggregator,
-        ERC20 _token,
-        ERC20 _gton,
-        IStaking _sgton,
-        string memory _bondType
+        uint bondLimit_,
+        uint bondActivePeriod_,
+        uint bondToClaimPeriod_,
+        uint discountNominator_,
+        IBondStorage bondStorage_,
+        AggregatorV3Interface tokenAggregator_,
+        AggregatorV3Interface gtonAggregator_,
+        ERC20 token_,
+        ERC20 gton_,
+        IStaking sgton_,
+        string memory bondType_
         ) ABonding(
-            _bondLimit, 
-            _bondActivePeriod, 
-            _bondToClaimPeriod, 
-            _discountNominator,
-            _bondStorage, 
-            _tokenAggregator,
-            _gtonAggregator,
-            _token,
-            _gton,
-            _sgton,
-            _bondType
-        )
-        {}
+            bondLimit_,
+            bondActivePeriod_,
+            bondToClaimPeriod_,
+            discountNominator_,
+            bondStorage_,
+            tokenAggregator_,
+            gtonAggregator_,
+            token_,
+            gton_,
+            sgton_,
+            bondType_
+        ){}
 
      /* ========== RESTRICTED ========== */
 
