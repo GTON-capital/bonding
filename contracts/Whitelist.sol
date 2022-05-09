@@ -1,12 +1,16 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
+import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
-import { AdminAccess } from "./access/AdminAccess.sol";
 
-contract Whitelist is IWhitelist, AdminAccess {
+contract Whitelist is InitializableOwnable, IWhitelist {
 
     mapping(address => uint) whitelist;
+
+    constructor() {
+        initOwner(msg.sender);
+    }
 
     function isWhitelisted(address user) public view returns(bool) {
         return whitelist[user] > 0;
@@ -16,7 +20,7 @@ contract Whitelist is IWhitelist, AdminAccess {
         return whitelist[user];
     }
 
-    function updateAllocation(address user, uint allocation) public onlyAdminOrOwner {
+    function updateAllocation(address user, uint allocation) public onlyOwner {
         whitelist[user] = allocation;
     }
 }

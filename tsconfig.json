@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "paths": {
+      "~/*": ["./*"],
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "./test",
+    "./tests",
+    "./client/services",
+    "@types/big.js",
+    "./scripts",
+    "./bots",
+    "./typechain-types"
+  ],
+  "files": ["./hardhat.config.ts"]
+}
