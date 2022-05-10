@@ -10,10 +10,16 @@ interface NFTContract {
 
 contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
 
-    address[] whitelistedNFTs;
-    mapping(address => uint) nftCollectionAllowance;
+    /* ========== STATE VARIABLES ========== */
+
+    address[] public whitelistedNFTs;
+    mapping(address => uint) public nftCollectionAllowance;
     mapping(address => bool) whitelistActivated;
     mapping(address => uint) whitelist;
+
+    constructor() {
+        initOwner(msg.sender);
+    }
 
     /* ========== VIEWS ========== */
 
@@ -50,19 +56,39 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function addCollection(address collection) external onlyOwner {
+    function addCollection(address collection, uint allocation) external onlyOwner {
         whitelistedNFTs.push(collection);
+        nftCollectionAllowance[collection] = allocation;
+        emit CollectionAdded(collection, allocation);
     }
 
     function removeCollection(address collection) external onlyOwner {
+        for (uint i = 0; i < whitelistedNFTs.length; i++) {
+            if (whitelistedNFTs[i] == collection) {
+                whitelistedNFTs[i] = whitelistedNFTs[whitelistedNFTs.length-1];
+                whitelistedNFTs.pop();
+                nftCollectionAllowance[collection] = 0;
+                emit CollectionRemoved(collection);
+                break;
+            }
+        }
     }
 
     function updateCollectionAllocation(address collection, uint allocation) external onlyOwner {
         nftCollectionAllowance[collection] = allocation;
+        emit CollectionAllocationUpdated(collection, allocation);
     }
 
-    function updateAllocation(address user, uint allocation) external onlyOwner {
+    function updateAllocation(address user, uint allocation) external onlyAdminOrOwner {
         whitelist[user] = allocation;
         whitelistActivated[user] = true;
+        emit UserAllocationUpdated(user, allocation);
     }
+
+    /* ========== EVENTS ========== */
+
+    event CollectionAdded(address collection, uint allocation);
+    event CollectionRemoved(address collection);
+    event CollectionAllocationUpdated(address collection, uint allocation);
+    event UserAllocationUpdated(address user, uint allocation);
 }

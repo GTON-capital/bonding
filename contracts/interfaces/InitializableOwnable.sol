@@ -6,20 +6,9 @@ contract InitializableOwnable {
 
     address public owner;
     address public newOwner;
+    mapping(address => bool) admins;
 
     bool internal initialized;
-
-    // ============ Events ============
-
-    event OwnerTransferRequested(
-        address indexed oldOwner, 
-        address indexed newOwner
-    );
-
-    event OwnershipTransferred(
-        address indexed oldOwner, 
-        address indexed newOwner
-    );
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
@@ -40,6 +29,16 @@ contract InitializableOwnable {
         newOwner = address(0);
     }
 
+    function addAdmin(address user) public onlyOwner {
+        emit AdminAdded(user);
+        admins[user] = true;
+    }
+
+    function removeAdmin(address user) public onlyOwner {
+        emit AdminRemoved(user);
+        admins[user] = false;
+    }
+
     /* ========== MODIFIERS ========== */
 
     modifier notInitialized() {
@@ -51,4 +50,24 @@ contract InitializableOwnable {
         require(msg.sender == owner, "Not owner");
         _;
     }
+
+    modifier onlyAdminOrOwner() {
+        require(admins[msg.sender] || owner == msg.sender, "Not admin or owner");
+        _;
+    }
+
+    /* ========== EVENTS ========== */
+
+    event OwnerTransferRequested(
+        address indexed oldOwner, 
+        address indexed newOwner
+    );
+
+    event OwnershipTransferred(
+        address indexed oldOwner, 
+        address indexed newOwner
+    );
+
+    event AdminAdded(address indexed admin);
+    event AdminRemoved(address indexed admin);
 }
