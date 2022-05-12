@@ -1,5 +1,6 @@
 
 const hre = require("hardhat")
+const Big = require('big.js')
 import { 
   ethers,
 } from "hardhat"
@@ -9,36 +10,58 @@ import {
 
 async function main() {
   await deployAndVerify()
-  await addCollection()
 }
 
 let contractName = "WhitelistWithNFT"
-let nftRinkeby = "0x834eB4A15bA4671ead8B67F46161E864F27C892A"
-let nftRopsten = "0x834eb4a15ba4671ead8b67f46161e864f27c892a"
+
 let whitelistRinkeby = "0xf852f018aE42AcEe92B3df1de36cF2CD0a8568f4"
 let whitelistRopsten = "0x37655e023A2991e76a8F974AE922e1a34Af36f0f"
-let collectionToAdd = nftRinkeby
-let contract = whitelistRinkeby
+
+let memorableNftRinkeby = "0x834eB4A15bA4671ead8B67F46161E864F27C892A"
+let lobsRinkeby = "0x37722f3729986E523E6bF8Abc9BAb37f40Ac2712"
+
+let memorableNftRopsten = "0x834eb4a15ba4671ead8b67f46161e864f27c892a"
+let lobsRopsten = "0x81fb974d856e8ceeffab5fb1656d2694f872d571"
+
+let nftsRopsten = [
+  memorableNftRopsten,
+  lobsRopsten
+]
+
+let initialNfts = nftsRopsten
+let initialNftAllocations = [
+  Big(1000).mul(1e18).toFixed(),
+  Big(5000).mul(1e18).toFixed()
+]
+
+let collectionToAdd = lobsRopsten
+
+let contract = whitelistRopsten
 
 async function deployAndVerify() { 
 
   console.log("Deploying on network: " + hre.network.name)
   const factory = await ethers.getContractFactory(contractName)
-  const contract = await factory.deploy()
+  const contract = await factory.deploy(
+    initialNfts,
+    initialNftAllocations,
+    [],
+    [],
+    []
+  )
   await contract.deployed()
 
   console.log("Contract deployed to:", contract.address)
 
   await delay(20000)
-  await verify(contract.address)
-}
-
-async function verify(address: string) {
-  console.log(hre.network.name)
   await hre.run("verify:verify", {
-    address: address,
-    // network: hre.network.name,
+    address: contract.address,
     constructorArguments: [
+      initialNfts,
+      initialNftAllocations,
+      [],
+      [],
+      []
     ]
   })
 }
@@ -46,7 +69,8 @@ async function verify(address: string) {
 async function addCollection() {
   try {
     let contract = await getContract() as WhitelistWithNFT
-    let request = await contract.addCollection(collectionToAdd)
+    let allocation = Big(1000).mul(1e18)
+    let request = await contract.addCollection(collectionToAdd, allocation)
     console.log("Collection added: " + request.hash)
   } catch (e) {
     console.log(e)

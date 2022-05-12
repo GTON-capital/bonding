@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
 
-interface NFTContract {
+interface ContractWithBalance {
     function balanceOf(address account) external view returns (uint256);
 }
 
@@ -12,23 +12,55 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
 
     /* ========== STATE VARIABLES ========== */
 
-    address[] public whitelistedNFTs;
-    mapping(address => uint) public nftCollectionAllowance;
-    mapping(address => bool) whitelistActivated;
-    mapping(address => uint) whitelist;
+    address[] public nfts;
+    mapping(address => uint) public nftAllocations;
 
-    constructor() {
+    address[] public tokens;
+    mapping(address => uint) public tokenAllocations;
+    mapping(address => uint) public tokenThresholds;
+
+    mapping(address => bool) whitelistActivated;
+    mapping(address => uint) userAllocations;
+
+    uint8 maxReferrals = 2;
+    mapping(address => uint8) referralsCount;
+
+    constructor(
+        address[] memory nfts_,
+        uint[] memory nftAllocations_,
+        address[] memory tokens_,
+        uint[] memory tokenAllocations_,
+        uint[] memory tokenThresholds_
+    ) {
+        require(nfts_.length == nftAllocations_.length, "Corrupt nft data");
+        require(tokens_.length == tokenAllocations_.length && 
+                tokens_.length == tokenThresholds_.length, "Corrupt token data");
         initOwner(msg.sender);
+        nfts = nfts_;
+        for (uint i = 0; i < nfts_.length; i++) {
+            nftAllocations[nfts_[i]] = nftAllocations_[i];
+        }
+        tokens = tokens_;
+        for (uint i = 0; i < tokens_.length; i++) {
+            tokenAllocations[tokens_[i]] = tokenAllocations_[i];
+            tokenThresholds[tokens_[i]] = tokenThresholds_[i];
+        }
     }
 
     /* ========== VIEWS ========== */
 
     function isWhitelisted(address user) external view returns(bool) {
-        if (whitelist[user] > 0) {
+        if (userAllocations[user] > 0) {
             return true;
         } else if (!whitelistActivated[user]) {
-            for (uint i = 0; i < whitelistedNFTs.length; i++) {
-                if (NFTContract(whitelistedNFTs[i]).balanceOf(user) > 0) {
+            for (uint i = 0; i < nfts.length; i++) {
+                if (ContractWithBalance(nfts[i]).balanceOf(user) > 0) {
+                    return true;
+                }
+            }
+            for (uint i = 0; i < tokens.length; i++) {
+                address token = tokens[i];
+                if (ContractWithBalance(token).balanceOf(user) > tokenThresholds[token]) {
                     return true;
                 }
             }
@@ -37,16 +69,24 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
     }
 
     function allowedAllocation(address user) external view returns(uint) {
-        if (whitelist[user] > 0) {
-            return whitelist[user];
+        if (userAllocations[user] > 0) {
+            return userAllocations[user];
         } else if (!whitelistActivated[user]) {
             uint allocation = 0;
-            for (uint i = 0; i < whitelistedNFTs.length; i++) {
-                address collectionAddress = whitelistedNFTs[i];
-                NFTContract nft = NFTContract(whitelistedNFTs[i]);
+            for (uint i = 0; i < nfts.length; i++) {
+                address collectionAddress = nfts[i];
+                ContractWithBalance nft = ContractWithBalance(nfts[i]);
                 if (nft.balanceOf(user) > 0) {
-                    uint collectionAllocation = nftCollectionAllowance[collectionAddress];
+                    uint collectionAllocation = nftAllocations[collectionAddress];
                     allocation = collectionAllocation > allocation ? collectionAllocation : allocation;
+                }
+            }
+            for (uint i = 0; i < tokens.length; i++) {
+                address tokenAddress = tokens[i];
+                ContractWithBalance token = ContractWithBalance(tokens[i]);
+                if (token.balanceOf(user) > tokenThresholds[tokenAddress]) {
+                    uint tokenAllocation = tokenAllocations[tokenAddress];
+                    allocation = tokenAllocation > allocation ? tokenAllocation : allocation;
                 }
             }
             return allocation;
@@ -57,17 +97,17 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     function addCollection(address collection, uint allocation) external onlyOwner {
-        whitelistedNFTs.push(collection);
-        nftCollectionAllowance[collection] = allocation;
+        nfts.push(collection);
+        nftAllocations[collection] = allocation;
         emit CollectionAdded(collection, allocation);
     }
 
     function removeCollection(address collection) external onlyOwner {
-        for (uint i = 0; i < whitelistedNFTs.length; i++) {
-            if (whitelistedNFTs[i] == collection) {
-                whitelistedNFTs[i] = whitelistedNFTs[whitelistedNFTs.length-1];
-                whitelistedNFTs.pop();
-                nftCollectionAllowance[collection] = 0;
+        for (uint i = 0; i < nfts.length; i++) {
+            if (nfts[i] == collection) {
+                nfts[i] = nfts[nfts.length-1];
+                nfts.pop();
+                nftAllocations[collection] = 0;
                 emit CollectionRemoved(collection);
                 break;
             }
@@ -75,20 +115,104 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
     }
 
     function updateCollectionAllocation(address collection, uint allocation) external onlyOwner {
-        nftCollectionAllowance[collection] = allocation;
+        nftAllocations[collection] = allocation;
         emit CollectionAllocationUpdated(collection, allocation);
     }
 
+    function addToken(address token, uint allocation, uint threshold) external onlyOwner {
+        tokens.push(token);
+        tokenAllocations[token] = allocation;
+        tokenThresholds[token] = threshold;
+        emit TokenAdded(token, allocation, threshold);
+    }
+
+    function removeToken(address token) external onlyOwner {
+        for (uint i = 0; i < tokens.length; i++) {
+            if (tokens[i] == token) {
+                tokens[i] = tokens[tokens.length-1];
+                tokens.pop();
+                tokenAllocations[token] = 0;
+                tokenThresholds[token] = 0;
+                emit TokenRemoved(token);
+                break;
+            }
+        }
+    }
+
+    function updateTokenAllocationAndThreshold(
+        address token, 
+        uint allocation,
+        uint threshold
+    ) external onlyOwner {
+        tokenAllocations[token] = allocation;
+        tokenThresholds[token] = threshold;
+        emit TokenAllocationAndThresholdUpdated(token, allocation, threshold);
+    }
+
     function updateAllocation(address user, uint allocation) external onlyAdminOrOwner {
-        whitelist[user] = allocation;
+        updateUserAllocation(user, allocation);
+    }
+
+    function updateUserAllocation(address user, uint allocation) internal {
+        userAllocations[user] = allocation;
         whitelistActivated[user] = true;
         emit UserAllocationUpdated(user, allocation);
     }
 
+    function setMaxReferrals(uint8 maxReferrals_) external {
+        maxReferrals = maxReferrals_;
+        emit MaxReferralsUpdated(maxReferrals_);
+    }
+
+    function referFriend(address user) external {
+        uint referrerAllocation = userAllocations[msg.sender];
+        require(referrerAllocation > 0, "You are not whitelisted");
+        require(referralsCount[msg.sender] < maxReferrals, "Too many referrals");
+        uint newAllocation = referrerAllocation / 2;
+        referralsCount[msg.sender] += 1;
+        updateUserAllocation(user, newAllocation);
+        emit Referral(msg.sender, user, newAllocation);
+    }
+
     /* ========== EVENTS ========== */
 
-    event CollectionAdded(address collection, uint allocation);
-    event CollectionRemoved(address collection);
-    event CollectionAllocationUpdated(address collection, uint allocation);
-    event UserAllocationUpdated(address user, uint allocation);
+    event CollectionAdded(
+        address indexed collection, 
+        uint indexed allocation
+    );
+    event CollectionRemoved(
+        address indexed collection
+    );
+    event CollectionAllocationUpdated(
+        address indexed collection,
+        uint indexed allocation
+    );
+
+    event TokenAdded(
+        address indexed token, 
+        uint indexed allocation, 
+        uint indexed threshold
+    );
+    event TokenRemoved(
+        address indexed token
+    );
+    event TokenAllocationAndThresholdUpdated(
+        address indexed token, 
+        uint indexed allocation, 
+        uint indexed threshold
+    );
+
+    event MaxReferralsUpdated(
+        uint8 value
+    );
+    event Referral(
+        address indexed referrer, 
+        address indexed friend, 
+        uint indexed allocation
+    );
+
+    event UserAllocationUpdated(
+        address indexed user, 
+        uint indexed allocation
+    );
 }
