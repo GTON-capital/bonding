@@ -68,7 +68,7 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
         return false;
     }
 
-    function allowedAllocation(address user) external view returns(uint) {
+    function allowedAllocation(address user) public view returns(uint) {
         if (userAllocations[user] > 0) {
             return userAllocations[user];
         } else if (!whitelistActivated[user]) {
@@ -165,7 +165,13 @@ contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
     }
 
     function referFriend(address user) external {
-        uint referrerAllocation = userAllocations[msg.sender];
+        uint referrerAllocation;
+        uint userAllocation = userAllocations[user];
+        if (userAllocation > 0) {
+            referrerAllocation = userAllocation;
+        } else {
+            referrerAllocation = allowedAllocation(msg.sender);
+        }
         require(referrerAllocation > 0, "You are not whitelisted");
         require(referralsCount[msg.sender] < maxReferrals, "Too many referrals");
         uint newAllocation = referrerAllocation / 2;

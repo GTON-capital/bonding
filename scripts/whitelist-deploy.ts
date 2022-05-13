@@ -23,15 +23,29 @@ let lobsRinkeby = "0x37722f3729986E523E6bF8Abc9BAb37f40Ac2712"
 let memorableNftRopsten = "0x834eb4a15ba4671ead8b67f46161e864f27c892a"
 let lobsRopsten = "0x81fb974d856e8ceeffab5fb1656d2694f872d571"
 
+let megaTokenRopsten = "0xbc10a04b76a5cd6bf2908e1237fb2d557482cf48"
+
 let nftsRopsten = [
   memorableNftRopsten,
   lobsRopsten
 ]
 
+let tokensRopsten = [
+  megaTokenRopsten
+]
+
 let initialNfts = nftsRopsten
 let initialNftAllocations = [
   Big(1000).mul(1e18).toFixed(),
-  Big(5000).mul(1e18).toFixed()
+  Big(5000).mul(1e18).toFixed(),
+]
+
+let initialTokens = tokensRopsten
+let initialTokenAllocations = [
+  Big(6666).mul(1e18).toFixed(),
+]
+let initialTokenThresholds = [
+  Big(1000).mul(1e18).toFixed(),
 ]
 
 let collectionToAdd = lobsRopsten
@@ -45,13 +59,15 @@ async function deployAndVerify() {
   const contract = await factory.deploy(
     initialNfts,
     initialNftAllocations,
-    [],
-    [],
-    []
+    initialTokens,
+    initialTokenAllocations,
+    initialTokenThresholds
   )
-  await contract.deployed()
+  console.log("Contract deploying to:", contract.address)
 
-  console.log("Contract deployed to:", contract.address)
+  console.log("Waiting for deploy")
+  await contract.deployed()
+  console.log("Deployed")
 
   await delay(20000)
   await hre.run("verify:verify", {
@@ -59,9 +75,9 @@ async function deployAndVerify() {
     constructorArguments: [
       initialNfts,
       initialNftAllocations,
-      [],
-      [],
-      []
+      initialTokens,
+      initialTokenAllocations,
+      initialTokenThresholds
     ]
   })
 }
