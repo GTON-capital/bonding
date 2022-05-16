@@ -5,14 +5,16 @@ import {
   ethers,
 } from "hardhat"
 import { 
-  WhitelistWithNFT,
+  GTONWhitelist,
+  GTONGranularWhitelist,
 } from "../types"
 
 async function main() {
-  await deployAndVerify()
+  await deployWhitelist()
 }
 
-let contractName = "WhitelistWithNFT"
+let mainWhitelistName = "GTONWhitelist"
+let granularWhitelistName = "GTONGranuralWhitelist"
 
 let whitelistRinkeby = "0xf852f018aE42AcEe92B3df1de36cF2CD0a8568f4"
 let whitelistRopsten = "0x37655e023A2991e76a8F974AE922e1a34Af36f0f"
@@ -52,10 +54,36 @@ let collectionToAdd = lobsRopsten
 
 let contract = whitelistRopsten
 
-async function deployAndVerify() { 
+async function deployWhitelist() { 
 
   console.log("Deploying on network: " + hre.network.name)
-  const factory = await ethers.getContractFactory(contractName)
+  const factory = await ethers.getContractFactory(mainWhitelistName)
+  const contract = await factory.deploy(
+    initialNfts,
+    initialTokens,
+    initialTokenThresholds
+  )
+  console.log("Contract deploying to:", contract.address)
+
+  console.log("Waiting for deploy")
+  await contract.deployed()
+  console.log("Deployed")
+
+  await delay(20000)
+  await hre.run("verify:verify", {
+    address: contract.address,
+    constructorArguments: [
+      initialNfts,
+      initialTokens,
+      initialTokenThresholds
+    ]
+  })
+}
+
+async function deployGranularWhitelist() { 
+
+  console.log("Deploying on network: " + hre.network.name)
+  const factory = await ethers.getContractFactory(granularWhitelistName)
   const contract = await factory.deploy(
     initialNfts,
     initialNftAllocations,
@@ -82,9 +110,9 @@ async function deployAndVerify() {
   })
 }
 
-async function addCollection() {
+async function addCollection(name: string) {
   try {
-    let contract = await getContract() as WhitelistWithNFT
+    let contract = await getContract() as GTONWhitelist
     let allocation = Big(1000).mul(1e18)
     let request = await contract.addCollection(collectionToAdd, allocation)
     console.log("Collection added: " + request.hash)
@@ -94,7 +122,7 @@ async function addCollection() {
 } 
 
 async function getContract() {
-  let Bonding = await ethers.getContractFactory(contractName)
+  let Bonding = await ethers.getContractFactory(mainWhitelistName)
   return Bonding.attach(
     contract
   )

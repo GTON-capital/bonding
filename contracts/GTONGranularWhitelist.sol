@@ -8,7 +8,7 @@ interface ContractWithBalance {
     function balanceOf(address account) external view returns (uint256);
 }
 
-contract WhitelistWithNFT is InitializableOwnable, IWhitelist {
+contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
 
     /* ========== STATE VARIABLES ========== */
 

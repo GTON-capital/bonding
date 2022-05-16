@@ -4,7 +4,7 @@ pragma solidity 0.8.13;
 import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
 import { IWhitelist } from "./interfaces/IWhitelist.sol";
 
-contract Whitelist is InitializableOwnable, IWhitelist {
+contract GTONSimpleWhitelist is InitializableOwnable, IWhitelist {
 
     mapping(address => uint) whitelist;
 
