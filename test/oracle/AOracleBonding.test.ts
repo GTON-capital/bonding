@@ -2,21 +2,21 @@ const { ethers } = require("hardhat");
 const { waffle } = require("hardhat");
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
-import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
+import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "../shared/utils"
 
 import { 
     BondStorage,
     MockAggregator,
-    MockABonding,
+    MockAOracleBonding,
     MockERC20,
     MockStaking
-} from "../types"
+} from "../../types"
 
 import { BigNumber, BigNumberish, Wallet } from "ethers"
 
 use(solidity)
 
-describe("Bonding", function () {
+describe("AOracleBonding", function () {
     const bondLimit = 1000;
     const time = {
         year: 31557600,
@@ -38,13 +38,13 @@ describe("Bonding", function () {
     let storage: BondStorage;
     let gtonAgg: MockAggregator;
     let tokenAgg: MockAggregator;
-    let bonding: MockABonding;
+    let bonding: MockAOracleBonding;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
 
     before(async () => {
-        Bonding = await ethers.getContractFactory("MockABonding", wallet)
+        Bonding = await ethers.getContractFactory("MockAOracleBonding", wallet)
         BondStorage = await ethers.getContractFactory("BondStorage")
         Aggregator = await ethers.getContractFactory("MockAggregator")
         ERC20 = await ethers.getContractFactory("MockERC20")
@@ -63,7 +63,7 @@ describe("Bonding", function () {
             token.address,
             gton.address,
             sgton.address,
-            ethers.utils.formatBytes32String("7d")) as MockABonding;
+            ethers.utils.formatBytes32String("7d")) as MockAOracleBonding;
     }
 
     beforeEach(async function () {

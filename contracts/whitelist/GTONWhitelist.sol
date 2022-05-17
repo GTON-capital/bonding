@@ -1,55 +1,48 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
-import { IWhitelist } from "./interfaces/IWhitelist.sol";
+import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
+import { IWhitelist } from "../interfaces/IWhitelist.sol";
 
 interface ContractWithBalance {
     function balanceOf(address account) external view returns (uint256);
 }
 
-contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
+contract GTONWhitelist is InitializableOwnable, IWhitelist {
 
     /* ========== STATE VARIABLES ========== */
 
+    uint baseAllocation = 100_000 * 1e18;
+
     address[] public nfts;
-    mapping(address => uint) public nftAllocations;
 
     address[] public tokens;
-    mapping(address => uint) public tokenAllocations;
     mapping(address => uint) public tokenThresholds;
 
     mapping(address => bool) whitelistActivated;
     mapping(address => uint) userAllocations;
 
-    uint8 maxReferrals = 2;
+    uint8 maxReferrals = 3;
     mapping(address => uint8) referralsCount;
+    mapping(address => bool) userWasReferred;
 
     constructor(
         address[] memory nfts_,
-        uint[] memory nftAllocations_,
         address[] memory tokens_,
-        uint[] memory tokenAllocations_,
         uint[] memory tokenThresholds_
     ) {
-        require(nfts_.length == nftAllocations_.length, "Corrupt nft data");
-        require(tokens_.length == tokenAllocations_.length && 
-                tokens_.length == tokenThresholds_.length, "Corrupt token data");
+        require(tokens_.length == tokenThresholds_.length, "Corrupt token data");
         initOwner(msg.sender);
         nfts = nfts_;
-        for (uint i = 0; i < nfts_.length; i++) {
-            nftAllocations[nfts_[i]] = nftAllocations_[i];
-        }
         tokens = tokens_;
         for (uint i = 0; i < tokens_.length; i++) {
-            tokenAllocations[tokens_[i]] = tokenAllocations_[i];
             tokenThresholds[tokens_[i]] = tokenThresholds_[i];
         }
     }
 
     /* ========== VIEWS ========== */
 
-    function isWhitelisted(address user) external view returns(bool) {
+    function isWhitelisted(address user) public view returns(bool) {
         if (userAllocations[user] > 0) {
             return true;
         } else if (!whitelistActivated[user]) {
@@ -71,35 +64,22 @@ contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
     function allowedAllocation(address user) public view returns(uint) {
         if (userAllocations[user] > 0) {
             return userAllocations[user];
-        } else if (!whitelistActivated[user]) {
-            uint allocation = 0;
-            for (uint i = 0; i < nfts.length; i++) {
-                address collectionAddress = nfts[i];
-                ContractWithBalance nft = ContractWithBalance(nfts[i]);
-                if (nft.balanceOf(user) > 0) {
-                    uint collectionAllocation = nftAllocations[collectionAddress];
-                    allocation = collectionAllocation > allocation ? collectionAllocation : allocation;
-                }
-            }
-            for (uint i = 0; i < tokens.length; i++) {
-                address tokenAddress = tokens[i];
-                ContractWithBalance token = ContractWithBalance(tokens[i]);
-                if (token.balanceOf(user) > tokenThresholds[tokenAddress]) {
-                    uint tokenAllocation = tokenAllocations[tokenAddress];
-                    allocation = tokenAllocation > allocation ? tokenAllocation : allocation;
-                }
-            }
-            return allocation;
+        } else if (!whitelistActivated[user] && isWhitelisted(user)) {
+            return baseAllocation;
         }
         return 0;
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
-    function addCollection(address collection, uint allocation) external onlyOwner {
+    function updateBaseAllocation(uint allocation) external onlyOwner {
+        baseAllocation = allocation;
+        emit BaseAllocationUpdated(allocation);
+    }
+
+    function addCollection(address collection) external onlyOwner {
         nfts.push(collection);
-        nftAllocations[collection] = allocation;
-        emit CollectionAdded(collection, allocation);
+        emit CollectionAdded(collection);
     }
 
     function removeCollection(address collection) external onlyOwner {
@@ -107,23 +87,16 @@ contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
             if (nfts[i] == collection) {
                 nfts[i] = nfts[nfts.length-1];
                 nfts.pop();
-                nftAllocations[collection] = 0;
                 emit CollectionRemoved(collection);
                 break;
             }
         }
     }
 
-    function updateCollectionAllocation(address collection, uint allocation) external onlyOwner {
-        nftAllocations[collection] = allocation;
-        emit CollectionAllocationUpdated(collection, allocation);
-    }
-
-    function addToken(address token, uint allocation, uint threshold) external onlyOwner {
+    function addToken(address token, uint threshold) external onlyOwner {
         tokens.push(token);
-        tokenAllocations[token] = allocation;
         tokenThresholds[token] = threshold;
-        emit TokenAdded(token, allocation, threshold);
+        emit TokenAdded(token, threshold);
     }
 
     function removeToken(address token) external onlyOwner {
@@ -131,7 +104,6 @@ contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
             if (tokens[i] == token) {
                 tokens[i] = tokens[tokens.length-1];
                 tokens.pop();
-                tokenAllocations[token] = 0;
                 tokenThresholds[token] = 0;
                 emit TokenRemoved(token);
                 break;
@@ -139,14 +111,12 @@ contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
         }
     }
 
-    function updateTokenAllocationAndThreshold(
+    function updateTokenThreshold(
         address token, 
-        uint allocation,
         uint threshold
     ) external onlyOwner {
-        tokenAllocations[token] = allocation;
         tokenThresholds[token] = threshold;
-        emit TokenAllocationAndThresholdUpdated(token, allocation, threshold);
+        emit TokenThresholdUpdated(token, threshold);
     }
 
     function updateAllocation(address user, uint allocation) external onlyAdminOrOwner {
@@ -165,56 +135,47 @@ contract GTONGranularWhitelist is InitializableOwnable, IWhitelist {
     }
 
     function referFriend(address user) external {
-        uint referrerAllocation;
-        uint userAllocation = userAllocations[user];
-        if (userAllocation > 0) {
-            referrerAllocation = userAllocation;
-        } else {
-            referrerAllocation = allowedAllocation(msg.sender);
-        }
-        require(referrerAllocation > 0, "You are not whitelisted");
+        require(isWhitelisted(msg.sender) || whitelistActivated[msg.sender], "You are not whitelisted");
+        require(!userWasReferred[msg.sender], "You were referred yourself");
         require(referralsCount[msg.sender] < maxReferrals, "Too many referrals");
-        uint newAllocation = referrerAllocation / 2;
+        require(!isWhitelisted(user), "Friend already on whitelist");
         referralsCount[msg.sender] += 1;
-        updateUserAllocation(user, newAllocation);
-        emit Referral(msg.sender, user, newAllocation);
+        userWasReferred[user] = true;
+        updateUserAllocation(user, baseAllocation);
+        emit Referral(msg.sender, user);
     }
 
     /* ========== EVENTS ========== */
 
-    event CollectionAdded(
-        address indexed collection, 
+    event BaseAllocationUpdated(
         uint indexed allocation
+    );
+
+    event CollectionAdded(
+        address indexed collection
     );
     event CollectionRemoved(
         address indexed collection
     );
-    event CollectionAllocationUpdated(
-        address indexed collection,
-        uint indexed allocation
-    );
 
     event TokenAdded(
         address indexed token, 
-        uint indexed allocation, 
         uint indexed threshold
     );
     event TokenRemoved(
         address indexed token
     );
-    event TokenAllocationAndThresholdUpdated(
+    event TokenThresholdUpdated(
         address indexed token, 
-        uint indexed allocation, 
         uint indexed threshold
     );
 
     event MaxReferralsUpdated(
-        uint8 value
+        uint8 indexed value
     );
     event Referral(
         address indexed referrer, 
-        address indexed friend, 
-        uint indexed allocation
+        address indexed friend
     );
 
     event UserAllocationUpdated(

@@ -2,20 +2,19 @@ const { ethers } = require("hardhat");
 const { waffle } = require("hardhat");
 import { expect, use } from "chai"
 import { solidity } from "ethereum-waffle"
-import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "./shared/utils"
+import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, extractTokenId } from "../shared/utils"
 
 import { 
     BondStorage,
     MockAggregator,
-    Bonding,
-    BondingETH,
+    GTONOracleBonding,
     MockERC20,
     MockStaking
-} from "../types"
+} from "../../types"
 
 use(solidity)
 
-describe("BondingETH", function () {
+describe("OracleBonding", function () {
     const bondLimit = 1000;
     const time = {
         year: 31557600,
@@ -37,13 +36,13 @@ describe("BondingETH", function () {
     let storage: BondStorage;
     let gtonAgg: MockAggregator;
     let tokenAgg: MockAggregator;
-    let bonding: BondingETH;
+    let bonding: GTONOracleBonding;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
 
     before(async () => {
-        Bonding = await ethers.getContractFactory("BondingETH", wallet)
+        Bonding = await ethers.getContractFactory("GTONOracleBonding", wallet)
         BondStorage = await ethers.getContractFactory("BondStorage")
         Aggregator = await ethers.getContractFactory("MockAggregator")
         ERC20 = await ethers.getContractFactory("MockERC20")
@@ -62,7 +61,7 @@ describe("BondingETH", function () {
             token.address,
             gton.address,
             sgton.address,
-            ethers.utils.formatBytes32String("7d")) as BondingETH;
+            ethers.utils.formatBytes32String("7d")) as GTONOracleBonding;
     }
 
     beforeEach(async function () {
@@ -76,13 +75,15 @@ describe("BondingETH", function () {
         await bonding.startBonding();
         await storage.setAdmin(bonding.address)
         await gton.mint(bonding.address, expandTo18Decimals(500000))
+        await token.mint(wallet.address, expandTo18Decimals(500000))
+        await token.mint(alice.address, expandTo18Decimals(5000))
     })
 
     const sampleAmount = expandTo18Decimals(10);
 
-
     it("Checks that mint issues nft token to user", async function () {
-        const tx = await bonding.mint(sampleAmount, { value: sampleAmount });
+        await token.approve(bonding.address, sampleAmount)
+        const tx = await bonding.mint(sampleAmount);
         const rc = await tx.wait();
         const id = extractTokenId(rc);
         expect(wallet.address).to.eq(await storage.ownerOf(id));
@@ -91,24 +92,29 @@ describe("BondingETH", function () {
 
     it("Cannot issue bond without active period and issue of bond ends after period", async () => {
         expect(await bonding.isBondingActive()).to.eq(true);
-        await bonding.mint(sampleAmount, { value: sampleAmount });
+        await token.approve(bonding.address, sampleAmount)
+        await bonding.mint(sampleAmount);
         await setTimestamp((await bonding.bondingWindowEndTimestamp()).toNumber())
         await expect(bonding.mint(sampleAmount)).to.be.revertedWith("Bonding: Mint is not available in this period");
         expect(await bonding.isBondingActive()).to.eq(false);
     })
 
     it("Check that it is impossible to mint with insufficient approve", async () => {
-        await expect(bonding.mint(sampleAmount, { value: sampleAmount.sub(1) })).to.be.revertedWith("Bonding: Insufficient amount of ETH");
+        await token.approve(bonding.address, sampleAmount.sub(1))
+        await expect(bonding.mint(sampleAmount)).to.be.revertedWith("ERC20: insufficient allowance");
     })
 
-    it("Can transfer native token from contract", async () => {
-        // works because of empty contract eth stoarge
-        await expect(bonding.connect(alice).transferNative(alice.address)).to.be.revertedWith("Not owner");
+    it("Can mint and claim after the bond period", async () => {
         const amount = expandTo18Decimals(100)
-        await bonding.mint(amount, { value: amount }) // mint to be sure that balance is not 0
-        const balanceBefore = await waffle.provider.getBalance(alice.address);
-        await bonding.transferNative(alice.address);
-        expect(await waffle.provider.getBalance(alice.address)).to.eq(balanceBefore.add(amount))
+        await token.approve(bonding.address, amount)
+        const tx = await bonding.mint(amount);
+        const rc = await tx.wait();
+        const id = extractTokenId(rc);
+        const data = await bonding.activeBonds(id);
+        await storage.approve(bonding.address, id);
+        await expect(bonding.claim(id)).to.be.revertedWith("Bonding: Bond is locked to claim now");
+        await setTimestamp(data.releaseTimestamp.toNumber())
+        await bonding.claim(id);
     })
 
 });

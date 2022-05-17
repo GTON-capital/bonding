@@ -1,8 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
-import { IWhitelist } from "./interfaces/IWhitelist.sol";
+import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
+import { IWhitelist } from "../interfaces/IWhitelist.sol";
 
 contract GTONSimpleWhitelist is InitializableOwnable, IWhitelist {
 

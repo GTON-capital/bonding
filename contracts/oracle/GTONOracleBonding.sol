@@ -1,16 +1,17 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import { ABonding } from "./ABonding.sol";
-import { IBondStorage } from "./interfaces/IBondStorage.sol";
+import { AOracleBonding } from "./AOracleBonding.sol";
+import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "./interfaces/IStaking.sol";
+import { IStaking } from "../interfaces/IStaking.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract BondingETH is ABonding {
+
+contract GTONOracleBonding is AOracleBonding {
 
     constructor(
         uint bondLimit_,
@@ -24,7 +25,7 @@ contract BondingETH is ABonding {
         ERC20 gton_,
         IStaking sgton_,
         string memory bondType_
-        ) ABonding(
+        ) AOracleBonding(
             bondLimit_,
             bondActivePeriod_,
             bondToClaimPeriod_,
@@ -43,13 +44,9 @@ contract BondingETH is ABonding {
     /**
      * Function issues bond to user by minting the NFT token for them.
      */
-    function mint(uint amount) external payable mintEnabled returns(uint id) {
-        require(msg.value >= amount, "Bonding: Insufficient amount of ETH");
+    function mint(uint amount) external mintEnabled returns(uint id) {
+        require(token.transferFrom(msg.sender, address(this), amount));
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);
-    }
-
-    function transferNative(address payable to) external onlyOwner {
-        to.transfer(address(this).balance);
     }
 }

@@ -1,19 +1,19 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import { IBasicBonding } from "./interfaces/IBasicBonding.sol";
-import { IBondStorage } from "./interfaces/IBondStorage.sol";
-import { IWhitelist } from "./interfaces/IWhitelist.sol";
-import { InitializableOwnable } from "./interfaces/InitializableOwnable.sol";
+import { IBasicBonding } from "../interfaces/IBasicBonding.sol";
+import { IBondStorage } from "../interfaces/IBondStorage.sol";
+import { IWhitelist } from "../interfaces/IWhitelist.sol";
+import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "./interfaces/IStaking.sol";
+import { IStaking } from "../interfaces/IStaking.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-abstract contract ABonding is IBasicBonding, InitializableOwnable, ERC721Holder, ReentrancyGuard {
+abstract contract AOracleBonding is IBasicBonding, InitializableOwnable, ERC721Holder, ReentrancyGuard {
 
     constructor(
         uint bondLimit_,

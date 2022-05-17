@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { ABonding } from "../ABonding.sol";
+import { AOracleBonding } from "../oracle/AOracleBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
@@ -10,7 +10,7 @@ import { IStaking } from "./../interfaces/IStaking.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract MockABonding is ABonding {
+contract MockAOracleBonding is AOracleBonding {
 
     constructor(
         uint _bondLimit, 
@@ -24,7 +24,7 @@ contract MockABonding is ABonding {
         ERC20 _gton,
         IStaking _sgton,
         string memory _bondType
-        ) ABonding(
+        ) AOracleBonding(
             _bondLimit, 
             _bondActivePeriod, 
             _bondToClaimPeriod, 
