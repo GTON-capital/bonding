@@ -7,14 +7,14 @@ import { timestampSetter, blockGetter, expandTo18Decimals, expandToDecimals, ext
 import { 
     BondStorage,
     MockAggregator,
-    GTONOracleBondingERC20,
+    GTONTwapBondingERC20,
     MockERC20,
     MockStaking
 } from "../../types"
 
 use(solidity)
 
-describe("OracleBonding", function () {
+describe("TwapBonding", function () {
     const bondLimit = 1000;
     const time = {
         year: 31557600,
@@ -36,13 +36,13 @@ describe("OracleBonding", function () {
     let storage: BondStorage;
     let gtonAgg: MockAggregator;
     let tokenAgg: MockAggregator;
-    let bonding: GTONOracleBondingERC20;
+    let bonding: GTONTwapBondingERC20;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
 
     before(async () => {
-        Bonding = await ethers.getContractFactory("GTONOracleBondingERC20", wallet)
+        Bonding = await ethers.getContractFactory("GTONTwapBondingERC20", wallet)
         BondStorage = await ethers.getContractFactory("BondStorage")
         Aggregator = await ethers.getContractFactory("MockAggregator")
         ERC20 = await ethers.getContractFactory("MockERC20")
@@ -61,7 +61,7 @@ describe("OracleBonding", function () {
             token.address,
             gton.address,
             sgton.address,
-            ethers.utils.formatBytes32String("7d")) as GTONOracleBondingERC20;
+            ethers.utils.formatBytes32String("7d")) as GTONTwapBondingERC20;
     }
 
     beforeEach(async function () {

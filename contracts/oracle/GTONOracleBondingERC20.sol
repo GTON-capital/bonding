@@ -11,7 +11,7 @@ import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
 
-contract GTONOracleBonding is AOracleBonding {
+contract GTONOracleBondingERC20 is AOracleBonding {
 
     constructor(
         uint bondLimit_,

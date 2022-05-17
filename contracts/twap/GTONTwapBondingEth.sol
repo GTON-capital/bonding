@@ -10,7 +10,7 @@ import { IStaking } from "../interfaces/IStaking.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
-contract GTONTwapBondingEth is ATwapBonding {
+contract GTONTwapBondingETH is ATwapBonding {
 
     constructor(
         uint bondLimit_,
