@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity >=0.8.15;
 
 import { IBasicBonding } from "../interfaces/IBasicBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
@@ -8,6 +8,7 @@ import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import { IStaking } from "../interfaces/IStaking.sol";
+import { IOracleUsd } from "../interfaces/IOracleUsd.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
@@ -21,8 +22,8 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
         uint bondToClaimPeriod_, 
         uint discountNominator_,
         IBondStorage bondStorage_,
-        AggregatorV3Interface tokenAggregator_,
-        AggregatorV3Interface gtonAggregator_,
+        AggregatorV3Interface tokenOracle_,
+        AggregatorV3Interface gtonOracle_,
         ERC20 token_,
         ERC20 gton_,
         IStaking sgton_,
@@ -34,8 +35,8 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
         bondToClaimPeriod = bondToClaimPeriod_;
         discountNominator = discountNominator_;
         bondStorage = bondStorage_;
-        tokenAggregator = tokenAggregator_;
-        gtonAggregator = gtonAggregator_;
+        tokenOracle = tokenOracle_;
+        gtonOracle = gtonOracle_;
         token = token_;
         gton = gton_;
         sgton = sgton_;
@@ -58,6 +59,7 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
     /* ========== CONSTANTS ========== */
 
     uint constant public discountDenominator = 10000;
+    uint public constant Q112 = 2 ** 112;
 
     /* ========== STATE VARIABLES ========== */
 
@@ -86,8 +88,8 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
     ERC20 immutable  public gton;
     IStaking immutable public sgton;
     IBondStorage immutable public bondStorage;
-    AggregatorV3Interface public tokenAggregator;
-    AggregatorV3Interface public gtonAggregator;
+    AggregatorV3Interface public tokenOracle;
+    AggregatorV3Interface public gtonOracle;
 
     /* ========== VIEWS ========== */
 
@@ -130,13 +132,13 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
      * Function calculates the amount of gton out for current price without discount
      */
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
-        (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonAggregator);
-        (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenAggregator);
+        (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonOracle);
+        (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenOracle);
         amountOut = amountIn * uint(tokenPrice) * gtonDecimals / tokenDecimals / uint(gtonPrice);
     }
 
     /**
-     * Function calculates the  amount of token that represents
+     * Function calculates the amount of token that represents
      */
     function amountWithoutDiscount(uint amount) public view returns (uint) {
         // to keep contract representation correctly
@@ -152,7 +154,7 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
 
     /**
      * Function checks if bond period is open by checking 
-     * that last block timestamp is between bondEpiration timestamp and lastBondActivation timestamp.
+     * that last block timestamp is between bondExpiration timestamp and lastBondActivation timestamp.
      */
     function isBondingActive() public view returns(bool) {
         return block.timestamp >= lastBondActivation && block.timestamp <= bondingWindowEndTimestamp();
@@ -167,6 +169,7 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
 
     /* ========== MUTATIVE FUNCTIONS ========== */
 
+    // Amount: token count without decimals
     function _mint(uint amount, address user, uint releaseTimestamp) internal nonReentrant returns(uint id) {
         require(bondLimit > bondCounter, "Bonding: Exceeded amount of bonds");
         uint amountWithoutDis = amountWithoutDiscount(amount);
@@ -216,16 +219,16 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
         emit BondingStarted(lastBondActivation, bondActivePeriod);
     }
 
-    function setGtonAggregator(AggregatorV3Interface agg) external onlyOwner {
-        address oldValue = address(gtonAggregator);
-        gtonAggregator = agg;
-        emit SetGtonAggregator(oldValue, address(agg));
+    function setGtonOracle(AggregatorV3Interface agg) external onlyOwner {
+        address oldValue = address(gtonOracle);
+        gtonOracle = agg;
+        emit SetGtonOracle(oldValue, address(agg));
     }
 
-    function setTokenAggregator(AggregatorV3Interface agg) external onlyOwner {
-        address oldValue = address(tokenAggregator);
-        tokenAggregator = agg;
-        emit SetTokenAggregator(oldValue, address(agg));
+    function setTokenOracle(AggregatorV3Interface agg) external onlyOwner {
+        address oldValue = address(tokenOracle);
+        tokenOracle = agg;
+        emit SetTokenOracle(oldValue, address(agg));
     }
 
     function setDiscountNominator(uint discountN_) external onlyOwner {

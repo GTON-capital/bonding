@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity >=0.8.15;
 
 import { ATwapBonding } from "./ATwapBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
@@ -19,8 +19,8 @@ contract GTONTwapBondingERC20 is ATwapBonding {
         uint bondToClaimPeriod_,
         uint discountNominator_,
         IBondStorage bondStorage_,
-        AggregatorV3Interface tokenAggregator_,
-        AggregatorV3Interface gtonAggregator_,
+        AggregatorV3Interface tokenOracle_,
+        AggregatorV3Interface gtonOracle_,
         ERC20 token_,
         ERC20 gton_,
         IStaking sgton_,
@@ -31,8 +31,8 @@ contract GTONTwapBondingERC20 is ATwapBonding {
             bondToClaimPeriod_,
             discountNominator_,
             bondStorage_,
-            tokenAggregator_,
-            gtonAggregator_,
+            tokenOracle_,
+            gtonOracle_,
             token_,
             gton_,
             sgton_,
@@ -43,6 +43,7 @@ contract GTONTwapBondingERC20 is ATwapBonding {
 
     /**
      * Function issues bond to user by minting the NFT token for them.
+     * Amount: token count without decimals
      */
     function mint(uint amount) external mintEnabled returns(uint id) {
         require(token.transferFrom(msg.sender, address(this), amount));

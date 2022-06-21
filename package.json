@@ -19,13 +19,15 @@
     "typechain": "^8.0.0"
   },
   "scripts": {
-    "bonding:deploy:ropsten": "hardhat run --network ropsten ./scripts/bonding-deploy.ts",
+    "bonding:deploy:ropsten": "hardhat run --network ropsten ./scripts/bonding-deploy-twap.ts",
     "whitelist:deploy:ropsten": "hardhat run --network ropsten ./scripts/whitelist-deploy.ts",
-    "bonding:deploy:rinkeby": "hardhat run --network rinkeby ./scripts/bonding-deploy.ts",
+    "bonding:deploy:rinkeby": "hardhat run --network rinkeby ./scripts/bonding-deploy-twap.ts",
     "whitelist:deploy:rinkeby": "hardhat run --network rinkeby ./scripts/whitelist-deploy.ts"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.4.0",
-    "@openzeppelin/contracts": "^4.5.0"
+    "@openzeppelin/contracts": "^4.5.0",
+    "@uniswap/v3-core": "^1.0.1",
+    "@uniswap/v3-periphery": "^1.4.1"
   }
 }

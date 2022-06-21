@@ -2,7 +2,7 @@
 const hre = require("hardhat")
 import { run, ethers } from "hardhat"
 import { 
-  BondingETH 
+  GTONOracleBondingETH
 } from "../types"
 
 async function main() {
@@ -44,7 +44,7 @@ let config = configWeek
 
 async function deployAndVerifyBonding() { 
 
-  const factory = await ethers.getContractFactory("BondingETH")
+  const factory = await ethers.getContractFactory("GTONOracleBondingETH")
   const contract = await factory.deploy(
     config.bondLimit,
     config.bondActivePeriod,
@@ -65,7 +65,6 @@ async function deployAndVerifyBonding() {
   await delay(20000)
   await hre.run("verify:verify", {
     address: contract.address,
-    // network: hre.network,
     constructorArguments: [
       config.bondLimit,
       config.bondActivePeriod,
@@ -84,7 +83,7 @@ async function deployAndVerifyBonding() {
 
 async function exampleCallToContract() {
   try {
-    let contract = await getETHContract() as BondingETH
+    let contract = await getETHContract() as GTONOracleBondingETH
     let request = await contract.isBondingActive()
     console.log(request)
   } catch (e) {
@@ -93,7 +92,7 @@ async function exampleCallToContract() {
 } 
 
 async function getETHContract() {
-  let Bonding = await ethers.getContractFactory("BondingETH")
+  let Bonding = await ethers.getContractFactory("GTONOracleBondingETH")
   return Bonding.attach(
     contract
   )

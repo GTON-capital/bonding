@@ -36,18 +36,20 @@ let tokensRopsten = [
   megaTokenRopsten
 ]
 
+// All allocation numbers are without decimals
+
 let initialNfts = nftsRopsten
 let initialNftAllocations = [
-  Big(1000).mul(1e18).toFixed(),
-  Big(5000).mul(1e18).toFixed(),
+  Big(1000).toFixed(),
+  Big(5000).toFixed(),
 ]
 
 let initialTokens = tokensRopsten
 let initialTokenAllocations = [
-  Big(6666).mul(1e18).toFixed(),
+  Big(6666).toFixed(),
 ]
 let initialTokenThresholds = [
-  Big(1000).mul(1e18).toFixed(),
+  Big(1000).toFixed(),
 ]
 
 let collectionToAdd = lobsRopsten
@@ -113,7 +115,7 @@ async function deployGranularWhitelist() {
 async function addCollection(name: string) {
   try {
     let contract = await getContract() as GTONWhitelist
-    let allocation = Big(1000).mul(1e18)
+    let allocation = Big(1000) // Without decimals
     let request = await contract.addCollection(collectionToAdd, allocation)
     console.log("Collection added: " + request.hash)
   } catch (e) {

@@ -34,8 +34,8 @@ interface IBasicBonding is IERC721Receiver {
     /**
      * @dev A set of events for updating contract parameters
      */
-    event SetGtonAggregator(address oldValue, address newValue);
-    event SetTokenAggregator(address oldValue, address newValue);
+    event SetGtonOracle(address oldValue, address newValue);
+    event SetTokenOracle(address oldValue, address newValue);
     event SetDiscountNominator(uint oldValue, uint newValue);
     event SetBondActivePeriod(uint oldValue, uint newValue);
     event SetBondToClaimPeriod(uint oldValue, uint newValue);

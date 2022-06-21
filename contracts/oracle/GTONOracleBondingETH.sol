@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity >=0.8.15;
 
 import { AOracleBonding } from "./AOracleBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
@@ -18,8 +18,8 @@ contract GTONOracleBondingETH is AOracleBonding {
         uint bondToClaimPeriod_,
         uint discountNominator_,
         IBondStorage bondStorage_,
-        AggregatorV3Interface tokenAggregator_,
-        AggregatorV3Interface gtonAggregator_,
+        AggregatorV3Interface tokenOracle_,
+        AggregatorV3Interface gtonOracle_,
         ERC20 token_,
         ERC20 gton_,
         IStaking sgton_,
@@ -30,8 +30,8 @@ contract GTONOracleBondingETH is AOracleBonding {
             bondToClaimPeriod_,
             discountNominator_,
             bondStorage_,
-            tokenAggregator_,
-            gtonAggregator_,
+            tokenOracle_,
+            gtonOracle_,
             token_,
             gton_,
             sgton_,
@@ -42,6 +42,7 @@ contract GTONOracleBondingETH is AOracleBonding {
 
     /**
      * Function issues bond to user by minting the NFT token for them.
+     * Amount: token count without decimals
      */
     function mint(uint amount) external payable mintEnabled returns(uint id) {
         require(msg.value >= amount, "Bonding: Insufficient amount of ETH");

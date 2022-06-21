@@ -116,13 +116,13 @@ describe("AOracleBonding", function () {
     })
 
     it("Access private functions check", async () => {
-        await expect(bonding.connect(alice).setGtonAggregator(tokenAgg.address)).to.be.revertedWith("Not owner")
-        await bonding.setGtonAggregator(tokenAgg.address)
-        expect(await bonding.gtonAggregator()).to.eq(tokenAgg.address);
+        await expect(bonding.connect(alice).setGtonOracle(tokenAgg.address)).to.be.revertedWith("Not owner")
+        await bonding.setGtonOracle(tokenAgg.address)
+        expect(await bonding.gtonOracle()).to.eq(tokenAgg.address);
 
-        await expect(bonding.connect(alice).setTokenAggregator(gtonAgg.address)).to.be.revertedWith("Not owner")
-        await bonding.setTokenAggregator(gtonAgg.address)
-        expect(await bonding.tokenAggregator()).to.eq(gtonAgg.address);
+        await expect(bonding.connect(alice).setTokenOracle(gtonAgg.address)).to.be.revertedWith("Not owner")
+        await bonding.setTokenOracle(gtonAgg.address)
+        expect(await bonding.tokenOracle()).to.eq(gtonAgg.address);
 
         const nominator = 1000
         await expect(bonding.connect(alice).setDiscountNominator(nominator)).to.be.revertedWith("Not owner")

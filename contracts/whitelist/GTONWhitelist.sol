@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity >=0.8.15;
 
 import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
 import { IWhitelist } from "../interfaces/IWhitelist.sol";
@@ -12,7 +12,8 @@ contract GTONWhitelist is InitializableOwnable, IWhitelist {
 
     /* ========== STATE VARIABLES ========== */
 
-    uint baseAllocation = 100_000 * 1e18;
+    // Allocation counted without decimals
+    uint baseAllocation = 100_000;
 
     address[] public nfts;
 

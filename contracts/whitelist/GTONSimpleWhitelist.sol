@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.13;
+pragma solidity >=0.8.15;
 
 import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
 import { IWhitelist } from "../interfaces/IWhitelist.sol";
