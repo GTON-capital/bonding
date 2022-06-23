@@ -7,54 +7,14 @@ import { IWhitelist } from "../interfaces/IWhitelist.sol";
 import { InitializableOwnable } from "../interfaces/InitializableOwnable.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import { IStaking } from "../interfaces/IStaking.sol";
 import { IOracleUsd } from "../interfaces/IOracleUsd.sol";
+import { IStaking } from "../interfaces/IStaking.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Holder, ReentrancyGuard {
-
-    constructor(
-        uint bondLimit_,
-        uint bondActivePeriod_,
-        uint bondToClaimPeriod_, 
-        uint discountNominator_,
-        IBondStorage bondStorage_,
-        AggregatorV3Interface tokenOracle_,
-        AggregatorV3Interface gtonOracle_,
-        ERC20 token_,
-        ERC20 gton_,
-        IStaking sgton_,
-        string memory bondType_
-        ) {
-        initOwner(msg.sender);
-        bondLimit = bondLimit_;
-        bondActivePeriod = bondActivePeriod_;
-        bondToClaimPeriod = bondToClaimPeriod_;
-        discountNominator = discountNominator_;
-        bondStorage = bondStorage_;
-        tokenOracle = tokenOracle_;
-        gtonOracle = gtonOracle_;
-        token = token_;
-        gton = gton_;
-        sgton = sgton_;
-        bondTypeBytes = bytes(bondType_);
-    }
-
-    /* ========== MODIFIERS  ========== */
-
-    /**
-     * Mofidier checks if bonding period is open and provides access to the function
-     * It is used for mint function.
-     */
-
-    modifier mintEnabled() {
-        require(isWhitelistActive || isBondingActive(), 
-            "Bonding: Mint is not available in this period");
-        _;
-    }
 
     /* ========== CONSTANTS ========== */
 
@@ -89,7 +49,36 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
     IStaking immutable public sgton;
     IBondStorage immutable public bondStorage;
     AggregatorV3Interface public tokenOracle;
-    AggregatorV3Interface public gtonOracle;
+    IOracleUsd public gtonOracle;
+
+    /* ========== Constructor ========== */
+
+    constructor(
+        uint bondLimit_,
+        uint bondActivePeriod_,
+        uint bondToClaimPeriod_, 
+        uint discountNominator_,
+        IBondStorage bondStorage_,
+        AggregatorV3Interface tokenOracle_,
+        IOracleUsd gtonOracle_,
+        ERC20 token_,
+        ERC20 gton_,
+        IStaking sgton_,
+        string memory bondType_
+        ) {
+        initOwner(msg.sender);
+        bondLimit = bondLimit_;
+        bondActivePeriod = bondActivePeriod_;
+        bondToClaimPeriod = bondToClaimPeriod_;
+        discountNominator = discountNominator_;
+        bondStorage = bondStorage_;
+        tokenOracle = tokenOracle_;
+        gtonOracle = gtonOracle_;
+        token = token_;
+        gton = gton_;
+        sgton = sgton_;
+        bondTypeBytes = bytes(bondType_);
+    }
 
     /* ========== VIEWS ========== */
 
@@ -132,9 +121,12 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
      * Function calculates the amount of gton out for current price without discount
      */
     function bondAmountOut(uint amountIn) public view returns (uint amountOut) {
-        (int256 gtonPrice, uint gtonDecimals) = tokenPriceAndDecimals(gtonOracle);
         (int256 tokenPrice, uint tokenDecimals) = tokenPriceAndDecimals(tokenOracle);
-        amountOut = amountIn * uint(tokenPrice) * gtonDecimals / tokenDecimals / uint(gtonPrice);
+
+        // Getting Q112-encoded price of 1 GTON
+        uint gtonPriceQ112 = gtonOracle.assetToUsd(address(gton), 1e18);
+        uint gtonPrice = 100 * Q112 / gtonPriceQ112;
+        amountOut = amountIn * uint(tokenPrice) / tokenDecimals / gtonPrice;
     }
 
     /**
@@ -219,7 +211,7 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
         emit BondingStarted(lastBondActivation, bondActivePeriod);
     }
 
-    function setGtonOracle(AggregatorV3Interface agg) external onlyOwner {
+    function setGtonOracle(IOracleUsd agg) external onlyOwner {
         address oldValue = address(gtonOracle);
         gtonOracle = agg;
         emit SetGtonOracle(oldValue, address(agg));
@@ -268,5 +260,18 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
     
     function transferToken(ERC20 token_, address user) external onlyOwner {
         require(token_.transfer(user, token_.balanceOf(address(this))));
+    }
+
+    /* ========== MODIFIERS  ========== */
+
+    /**
+     * Mofidier checks if bonding period is open and provides access to the function
+     * It is used for mint function.
+     */
+
+    modifier mintEnabled() {
+        require(isWhitelistActive || isBondingActive(), 
+            "Bonding: Mint is not available in this period");
+        _;
     }
 }

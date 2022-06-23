@@ -5,6 +5,7 @@ import { ATwapBonding } from "../twap/ATwapBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import { IOracleUsd } from "../interfaces/IOracleUsd.sol";
 import { IStaking } from "./../interfaces/IStaking.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -19,7 +20,7 @@ contract MockATwapBonding is ATwapBonding {
         uint _discountNominator,
         IBondStorage _bondStorage, 
         AggregatorV3Interface _tokenOracle,
-        AggregatorV3Interface _gtonOracle,
+        IOracleUsd _gtonOracle,
         ERC20 _token,
         ERC20 _gton,
         IStaking _sgton,
@@ -45,5 +46,4 @@ contract MockATwapBonding is ATwapBonding {
         uint releaseTimestamp = block.timestamp + bondToClaimPeriod;
         id = _mint(amount, msg.sender, releaseTimestamp);
     }
-
 }

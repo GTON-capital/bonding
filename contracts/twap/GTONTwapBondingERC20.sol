@@ -5,6 +5,7 @@ import { ATwapBonding } from "./ATwapBonding.sol";
 import { IBondStorage } from "../interfaces/IBondStorage.sol";
 
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import { IOracleUsd } from "../interfaces/IOracleUsd.sol";
 import { IStaking } from "../interfaces/IStaking.sol";
 
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -20,7 +21,7 @@ contract GTONTwapBondingERC20 is ATwapBonding {
         uint discountNominator_,
         IBondStorage bondStorage_,
         AggregatorV3Interface tokenOracle_,
-        AggregatorV3Interface gtonOracle_,
+        IOracleUsd gtonOracle_,
         ERC20 token_,
         ERC20 gton_,
         IStaking sgton_,

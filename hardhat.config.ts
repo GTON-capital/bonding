@@ -1,7 +1,8 @@
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import "@nomiclabs/hardhat-etherscan"
+import '@nomiclabs/hardhat-etherscan'
+import 'hardhat-gas-reporter'
 
 require('dotenv').config();
 import { resolve } from "path";
@@ -40,7 +41,7 @@ module.exports = {
     ropsten: {
       url: "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161",
       accounts: [PRIVATE_KEY],
-      gasPrice: 14 * 1e9,
+      gasPrice: 528 * 1e9,
       gasMultiplier: 1,
     },
     ftm: {

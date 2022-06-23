@@ -3,12 +3,8 @@ const hre = require("hardhat")
 import { run, ethers } from "hardhat"
 import { 
   GTONTwapBondingETH,
-  TwapOracle
+  TwapOracleMock
 } from "../types"
-
-async function main() {
-  await deployAndTwapOracle()
-}
 
 let rinkebyBondingWeek = ""
 let rinkebyBonding90days = ""
@@ -25,6 +21,8 @@ let configWeek = {
   tokenAddress: "0xd0011de099e514c2094a510dd0109f91bf8791fa",
   gtonAddress: "0xc4d0a76ba5909c8e764b67acf7360f843fbacb2d",
   stakedGtonAddress: "0x314650ac2876c6B6f354499362Df8B4DC95E4750",
+  aggregatorUSDC: "",
+  twapOracleGTON: "0x866c5444aee458F2F81b545f5a6A603D9AD633b4",
   bondTypeString: "7d"
 }
 let config90days = {
@@ -38,10 +36,16 @@ let config90days = {
   tokenAddress: "0xd0011de099e514c2094a510dd0109f91bf8791fa",
   gtonAddress: "0xc4d0a76ba5909c8e764b67acf7360f843fbacb2d",
   stakedGtonAddress: "0x314650ac2876c6B6f354499362Df8B4DC95E4750",
+  aggregatorUSDC: "",
+  twapOracleGTON: "",
   bondTypeString: "7d"
 }
 
 let config = configWeek
+
+async function main() {
+  await deployAndTwapOracle()
+}
 
 async function deployAndVerifyBonding() {
 
@@ -101,7 +105,7 @@ async function getETHContract() {
 }
 
 async function deployAndTwapOracle() {
-  const factory = await ethers.getContractFactory("TwapOracle")
+  const factory = await ethers.getContractFactory("TwapOracleMock")
   const contract = await factory.deploy(
   )
   await contract.deployed()
