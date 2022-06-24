@@ -126,7 +126,7 @@ abstract contract ATwapBonding is IBasicBonding, InitializableOwnable, ERC721Hol
         // Getting Q112-encoded price of 1 GTON
         uint gtonPriceQ112 = gtonOracle.assetToUsd(address(gton), 1e18);
         uint gtonPrice = 100 * Q112 / gtonPriceQ112;
-        amountOut = amountIn * uint(tokenPrice) / tokenDecimals / gtonPrice;
+        amountOut = amountIn * uint(tokenPrice) / tokenDecimals / 1;
     }
 
     /**

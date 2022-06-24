@@ -1,12 +1,12 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.15;
 
-import { IOracleUsd } from "../../interfaces/IOracleUsd.sol";
+import { IOracleUsd } from "../interfaces/IOracleUsd.sol";
 
 // Working implementation:
 // https://github.com/GTON-capital/gcd-oracles/blob/main/contracts/impl/UniswapV3Oracle.sol
 
-contract TwapOracleMock is IOracleUsd {
+contract MockTwapOracle is IOracleUsd {
 
     // UniV3 price when UI says: 1 gtonUSDC = 1.001 tGTON
     // 1 GTON swap's expected output: 0.999299 gtonUSDC

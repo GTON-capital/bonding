@@ -9,7 +9,8 @@ import {
     MockAggregator,
     MockATwapBonding,
     MockERC20,
-    MockStaking
+    MockStaking,
+    MockTwapOracle,
 } from "../../types"
 
 import { BigNumber, BigNumberish, Wallet } from "ethers"
@@ -29,37 +30,39 @@ describe("ATwapBonding", function () {
 
     const setTimestamp = timestampSetter(waffle.provider)
 
-    let Bonding: any
-    let BondStorage: any
-    let Aggregator: any
-    let ERC20: any
-    let Staking: any
+    let BondingFactory: any
+    let BondStorageFactory: any
+    let AggregatorFactory: any
+    let MockTwapFactory: any
+    let ERC20Factory: any
+    let StakingFactory: any
 
     let storage: BondStorage;
-    let gtonAgg: MockAggregator;
-    let tokenAgg: MockAggregator;
+    let gtonOracle: MockTwapOracle;
+    let tokenOracle: MockAggregator;
     let bonding: MockATwapBonding;
     let sgton: MockStaking;
     let gton: MockERC20
     let token: MockERC20
 
     before(async () => {
-        Bonding = await ethers.getContractFactory("MockATwapBonding", wallet)
-        BondStorage = await ethers.getContractFactory("BondStorage")
-        Aggregator = await ethers.getContractFactory("MockAggregator")
-        ERC20 = await ethers.getContractFactory("MockERC20")
-        Staking = await ethers.getContractFactory("MockStaking")
+        BondingFactory = await ethers.getContractFactory("MockATwapBonding", wallet)
+        BondStorageFactory = await ethers.getContractFactory("BondStorage")
+        AggregatorFactory = await ethers.getContractFactory("MockAggregator")
+        MockTwapFactory = await ethers.getContractFactory("MockTwapOracle")
+        ERC20Factory = await ethers.getContractFactory("MockERC20")
+        StakingFactory = await ethers.getContractFactory("MockStaking")
     })
 
     async function deployDefaultBonding() {
-        return await Bonding.deploy(
+        return await BondingFactory.deploy(
             bondLimit,
             time.quarter,
             time.halfMonth,
             2500, // discount
             storage.address,
-            tokenAgg.address,
-            gtonAgg.address,
+            tokenOracle.address,
+            gtonOracle.address,
             token.address,
             gton.address,
             sgton.address,
@@ -67,12 +70,12 @@ describe("ATwapBonding", function () {
     }
 
     beforeEach(async function () {
-        gton = await ERC20.deploy("Graviton", "GTON");
-        sgton = await Staking.deploy(gton.address, "Staking GTON", "sGTON", 2232, time.day)
-        token = await ERC20.deploy("Token", "TKN");
-        storage = await BondStorage.deploy("BondStorage", "BondS") as BondStorage;
-        gtonAgg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
-        tokenAgg = await Aggregator.deploy(6, 2120000) as MockAggregator; // 2.12
+        gton = await ERC20Factory.deploy("Graviton", "GTON");
+        sgton = await StakingFactory.deploy(gton.address, "Staking GTON", "sGTON", 2232, time.day)
+        token = await ERC20Factory.deploy("Token", "TKN");
+        storage = await BondStorageFactory.deploy("BondStorage", "BondS") as BondStorage;
+        gtonOracle = await MockTwapFactory.deploy() as MockTwapOracle; // 2.12
+        tokenOracle = await AggregatorFactory.deploy(6, 2120000) as MockAggregator; // 2.12
         bonding = await deployDefaultBonding()
         await bonding.startBonding();
         await storage.setAdmin(bonding.address)
@@ -116,13 +119,13 @@ describe("ATwapBonding", function () {
     })
 
     it("Access private functions check", async () => {
-        await expect(bonding.connect(alice).setGtonOracle(tokenAgg.address)).to.be.revertedWith("Not owner")
-        await bonding.setGtonOracle(tokenAgg.address)
-        expect(await bonding.gtonOracle()).to.eq(tokenAgg.address);
+        await expect(bonding.connect(alice).setGtonOracle(tokenOracle.address)).to.be.revertedWith("Not owner")
+        await bonding.setGtonOracle(tokenOracle.address)
+        expect(await bonding.gtonOracle()).to.eq(tokenOracle.address);
 
-        await expect(bonding.connect(alice).setTokenOracle(gtonAgg.address)).to.be.revertedWith("Not owner")
-        await bonding.setTokenOracle(gtonAgg.address)
-        expect(await bonding.tokenOracle()).to.eq(gtonAgg.address);
+        await expect(bonding.connect(alice).setTokenOracle(gtonOracle.address)).to.be.revertedWith("Not owner")
+        await bonding.setTokenOracle(gtonOracle.address)
+        expect(await bonding.tokenOracle()).to.eq(gtonOracle.address);
 
         const nominator = 1000
         await expect(bonding.connect(alice).setDiscountNominator(nominator)).to.be.revertedWith("Not owner")
@@ -210,11 +213,15 @@ describe("ATwapBonding", function () {
             await agg.updatePriceAndDecimals(price, decimals)
         }
 
+        async function updateTwapPrice(oracle: MockTwapOracle, price: number, decimals: number) {
+            // await oracle.setValue()
+        }
+
         it("Check price and decimals calculations", async () => {
             for (const amount of amounts) {
                 for (const { tokenPrice, tokenDecimals, gtonPrice, gtonDecimals } of prices) {
-                    await updatePrice(tokenAgg, tokenPrice, tokenDecimals);
-                    await updatePrice(gtonAgg, gtonPrice, gtonDecimals);
+                    await updatePrice(tokenOracle, tokenPrice, tokenDecimals);
+                    await updateTwapPrice(gtonOracle, gtonPrice, gtonDecimals);
                     const amountOut = amount.mul(tokenPrice).mul(gtonDecimals).div(tokenDecimals).div(gtonPrice)
                     expect(await bonding.bondAmountOut(amount)).to.eq(amountOut);
                 }
